@@ -1,0 +1,9 @@
+{
+  "name": "EcoWing (生態之翼)",
+  "description": "An AI-powered coastal waste mapping and monitoring platform focused on Hong Kong and global expansion. Features Gemini-based waste analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

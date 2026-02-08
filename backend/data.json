@@ -1,0 +1,4388 @@
+[
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "Various plastic containers and debris scattered on a sandy, pebbly beach.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 280.0,
+        "xmin": 130.0,
+        "ymax": 360.0,
+        "xmax": 420.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 120.0,
+        "xmin": 70.0,
+        "ymax": 200.0,
+        "xmax": 350.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 90.0,
+        "xmin": 50.0,
+        "ymax": 150.0,
+        "xmax": 250.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 50.0,
+        "xmin": 10.0,
+        "ymax": 100.0,
+        "xmax": 150.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 600.0,
+        "xmin": 380.0,
+        "ymax": 700.0,
+        "xmax": 500.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 490.0,
+        "xmin": 700.0,
+        "ymax": 550.0,
+        "xmax": 780.0,
+        "label": "Plastic (Container)"
+      }
+    ],
+    "timestamp": "2026-01-31T00:28:06.982743",
+    "waste_distribution": {
+      "Plastic": 5,
+      "Other": 1
+    },
+    "unique_item_count": 6,
+    "id": "1769790486982",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A plastic container, a metal can, and a tennis ball are scattered among rocks and leaves on a coastal area.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 280.0,
+        "xmin": 340.0,
+        "ymax": 760.0,
+        "xmax": 520.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 300.0,
+        "xmin": 380.0,
+        "ymax": 650.0,
+        "xmax": 710.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 530.0,
+        "ymax": 1050.0,
+        "xmax": 680.0,
+        "label": "Plastic (Container)"
+      }
+    ],
+    "timestamp": "2026-01-31T00:29:30.459422",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Rubber": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769790570459",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A heavily polluted coastal area with scattered plastic bottles, foam pieces, and other debris mixed with natural vegetation.",
+    "estimatedWeightKg": 5.2,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 746.0,
+        "xmin": 503.0,
+        "ymax": 874.0,
+        "xmax": 619.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 872.0,
+        "xmin": 619.0,
+        "ymax": 985.0,
+        "xmax": 735.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 985.0,
+        "xmin": 735.0,
+        "ymax": 1098.0,
+        "xmax": 850.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 1098.0,
+        "xmin": 850.0,
+        "ymax": 1210.0,
+        "xmax": 960.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 619.0,
+        "xmin": 450.0,
+        "ymax": 746.0,
+        "xmax": 566.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 480.0,
+        "xmin": 300.0,
+        "ymax": 500.0,
+        "xmax": 360.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 270.0,
+        "xmin": 180.0,
+        "ymax": 320.0,
+        "xmax": 240.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 100.0,
+        "xmin": 50.0,
+        "ymax": 150.0,
+        "xmax": 120.0,
+        "label": "Plastic (Bottle)"
+      }
+    ],
+    "timestamp": "2026-01-31T00:30:21.621165",
+    "waste_distribution": {
+      "Plastic": 10,
+      "Other": 5
+    },
+    "unique_item_count": 15,
+    "id": "1769790621621",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A broken brown glass bottle neck and a crumpled blue and white paper item on sandy beach.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 140.0,
+        "xmin": 430.0,
+        "ymax": 510.0,
+        "xmax": 640.0,
+        "label": "Glass (Bottle)"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 420.0,
+        "ymax": 1160.0,
+        "xmax": 630.0,
+        "label": "Glass (Bottle)"
+      }
+    ],
+    "timestamp": "2026-01-31T00:31:19.982951",
+    "waste_distribution": {
+      "Glass": 1,
+      "Paper": 1
+    },
+    "unique_item_count": 2,
+    "id": "1769790679983",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": null,
+    "severity": "HIGH",
+    "description": "The video shows a significant amount of plastic waste, including bottles and bags, along with some wood debris. The presence of multiple types of waste indicates a moderate to high level of pollution that requires prompt cleanup.",
+    "estimatedWeightKg": 32.32,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 200.0,
+        "xmin": 100.0,
+        "ymax": 300.0,
+        "xmax": 250.0,
+        "label": "Plastic Bottle"
+      },
+      {
+        "ymin": 350.0,
+        "xmin": 50.0,
+        "ymax": 450.0,
+        "xmax": 150.0,
+        "label": "Plastic Bag"
+      },
+      {
+        "ymin": 500.0,
+        "xmin": 200.0,
+        "ymax": 600.0,
+        "xmax": 350.0,
+        "label": "Wood Driftwood"
+      }
+    ],
+    "timestamp": "2026-01-31T00:33:08.858890",
+    "waste_distribution": {
+      "Plastic": 6,
+      "Wood": 2,
+      "Metal": 1,
+      "Other": 1
+    },
+    "unique_item_count": 10,
+    "id": "1769790788858",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": null,
+    "severity": "HIGH",
+    "description": "The video shows a significant amount of waste, primarily plastic, scattered across the coastal area. The presence of various types of waste indicates a need for immediate cleanup efforts to prevent further environmental degradation.",
+    "estimatedWeightKg": 40.26,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 200.0,
+        "xmin": 300.0,
+        "ymax": 300.0,
+        "xmax": 400.0,
+        "label": "Plastic Bottle"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 500.0,
+        "ymax": 500.0,
+        "xmax": 600.0,
+        "label": "Metal Can"
+      },
+      {
+        "ymin": 600.0,
+        "xmin": 700.0,
+        "ymax": 700.0,
+        "xmax": 800.0,
+        "label": "Glass Bottle"
+      }
+    ],
+    "timestamp": "2026-01-31T00:57:20.391453",
+    "waste_distribution": {
+      "Plastic": 5,
+      "Metal": 2,
+      "Glass": 1,
+      "Paper": 1,
+      "Fabric": 1
+    },
+    "unique_item_count": 10,
+    "id": "1769792240391",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Packaging",
+    "severity": "MEDIUM",
+    "description": "Scattered plastic waste including a small green and yellow package, a piece of clear plastic, and other debris on the sandy beach near the waterline.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 390.0,
+        "xmin": 380.0,
+        "ymax": 430.0,
+        "xmax": 420.0,
+        "label": "Plastic (Packaging)"
+      },
+      {
+        "ymin": 460.0,
+        "xmin": 450.0,
+        "ymax": 470.0,
+        "xmax": 550.0,
+        "label": "Plastic (Packaging)"
+      },
+      {
+        "ymin": 350.0,
+        "xmin": 340.0,
+        "ymax": 370.0,
+        "xmax": 360.0,
+        "label": "Plastic (Packaging)"
+      },
+      {
+        "ymin": 20.0,
+        "xmin": 10.0,
+        "ymax": 30.0,
+        "xmax": 60.0,
+        "label": "Plastic (Packaging)"
+      },
+      {
+        "ymin": 850.0,
+        "xmin": 280.0,
+        "ymax": 900.0,
+        "xmax": 310.0,
+        "label": "Plastic (Packaging)"
+      }
+    ],
+    "timestamp": "2026-01-31T00:58:43.305772",
+    "waste_distribution": {
+      "Plastic": 4,
+      "Other": 1
+    },
+    "unique_item_count": 5,
+    "id": "1769792323305",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Other",
+    "severity": "MEDIUM",
+    "description": "A sandy beach with scattered plastic waste including small fragments, a dark elongated piece, and other miscellaneous debris.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 580.0,
+        "xmin": 450.0,
+        "ymax": 660.0,
+        "xmax": 720.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 410.0,
+        "xmin": 430.0,
+        "ymax": 470.0,
+        "xmax": 490.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 380.0,
+        "xmin": 310.0,
+        "ymax": 340.0,
+        "xmax": 360.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 280.0,
+        "xmin": 250.0,
+        "ymax": 270.0,
+        "xmax": 275.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 200.0,
+        "xmin": 220.0,
+        "ymax": 230.0,
+        "xmax": 235.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 150.0,
+        "xmin": 160.0,
+        "ymax": 170.0,
+        "xmax": 175.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 100.0,
+        "xmin": 110.0,
+        "ymax": 120.0,
+        "xmax": 125.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 50.0,
+        "xmin": 60.0,
+        "ymax": 70.0,
+        "xmax": 75.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 30.0,
+        "xmin": 40.0,
+        "ymax": 50.0,
+        "xmax": 55.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 10.0,
+        "xmin": 20.0,
+        "ymax": 30.0,
+        "xmax": 35.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 100.0,
+        "xmin": 150.0,
+        "ymax": 180.0,
+        "xmax": 190.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 200.0,
+        "xmin": 250.0,
+        "ymax": 270.0,
+        "xmax": 280.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 300.0,
+        "xmin": 350.0,
+        "ymax": 370.0,
+        "xmax": 380.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 450.0,
+        "ymax": 470.0,
+        "xmax": 480.0,
+        "label": "Plastic (Other)"
+      },
+      {
+        "ymin": 500.0,
+        "xmin": 550.0,
+        "ymax": 570.0,
+        "xmax": 580.0,
+        "label": "Plastic (Other)"
+      }
+    ],
+    "timestamp": "2026-01-31T00:59:37.698653",
+    "waste_distribution": {
+      "Plastic": 10,
+      "Wood": 3,
+      "Other": 2
+    },
+    "unique_item_count": 15,
+    "id": "1769792377698",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Other",
+    "severity": "MEDIUM",
+    "description": "A small piece of black plastic waste partially buried in the sand near the water's edge.",
+    "estimatedWeightKg": 0.05,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 570.0,
+        "xmin": 230.0,
+        "ymax": 720.0,
+        "xmax": 560.0,
+        "label": "Plastic (Other)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:00:27.438372",
+    "waste_distribution": {
+      "Plastic": 1
+    },
+    "unique_item_count": 1,
+    "id": "1769792427438",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A coastal area littered with plastic waste, including a blue bottle and various other debris, mixed with seaweed on the shore.",
+    "estimatedWeightKg": 2.5,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 570.0,
+        "xmin": 515.0,
+        "ymax": 615.0,
+        "xmax": 565.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 730.0,
+        "xmin": 400.0,
+        "ymax": 760.0,
+        "xmax": 450.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 680.0,
+        "xmin": 450.0,
+        "ymax": 700.0,
+        "xmax": 490.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 620.0,
+        "xmin": 550.0,
+        "ymax": 640.0,
+        "xmax": 580.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 600.0,
+        "xmin": 600.0,
+        "ymax": 620.0,
+        "xmax": 620.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 590.0,
+        "xmin": 580.0,
+        "ymax": 600.0,
+        "xmax": 600.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 580.0,
+        "xmin": 560.0,
+        "ymax": 590.0,
+        "xmax": 580.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 570.0,
+        "xmin": 540.0,
+        "ymax": 570.0,
+        "xmax": 560.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 560.0,
+        "xmin": 520.0,
+        "ymax": 550.0,
+        "xmax": 540.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 550.0,
+        "xmin": 500.0,
+        "ymax": 530.0,
+        "xmax": 520.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 540.0,
+        "xmin": 480.0,
+        "ymax": 510.0,
+        "xmax": 500.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 530.0,
+        "xmin": 460.0,
+        "ymax": 490.0,
+        "xmax": 480.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 520.0,
+        "xmin": 440.0,
+        "ymax": 470.0,
+        "xmax": 460.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 510.0,
+        "xmin": 420.0,
+        "ymax": 450.0,
+        "xmax": 440.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 500.0,
+        "xmin": 400.0,
+        "ymax": 430.0,
+        "xmax": 420.0,
+        "label": "Plastic (Bottle)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:01:43.978772",
+    "waste_distribution": {
+      "Plastic": 12,
+      "Other": 3
+    },
+    "unique_item_count": 15,
+    "id": "1769792503978",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Foam",
+    "severity": "MEDIUM",
+    "description": "A coastal area heavily littered with white foam pieces, plastic bottles, and other debris mixed with natural vegetation.",
+    "estimatedWeightKg": 5.2,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 690.0,
+        "xmin": 45.0,
+        "ymax": 780.0,
+        "xmax": 190.0,
+        "label": "Plastic (Foam)"
+      },
+      {
+        "ymin": 300.0,
+        "xmin": 230.0,
+        "ymax": 560.0,
+        "xmax": 360.0,
+        "label": "Plastic (Foam)"
+      },
+      {
+        "ymin": 150.0,
+        "xmin": 100.0,
+        "ymax": 200.0,
+        "xmax": 150.0,
+        "label": "Plastic (Foam)"
+      },
+      {
+        "ymin": 500.0,
+        "xmin": 150.0,
+        "ymax": 600.0,
+        "xmax": 250.0,
+        "label": "Plastic (Foam)"
+      },
+      {
+        "ymin": 200.0,
+        "xmin": 300.0,
+        "ymax": 400.0,
+        "xmax": 400.0,
+        "label": "Plastic (Foam)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:03:08.212461",
+    "waste_distribution": {
+      "Plastic": 8,
+      "Other": 7
+    },
+    "unique_item_count": 15,
+    "id": "1769792588212",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "Several plastic bottles and a piece of white plastic debris scattered on a rocky beach, mixed with seaweed.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 720.0,
+        "xmin": 130.0,
+        "ymax": 870.0,
+        "xmax": 260.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 510.0,
+        "xmin": 420.0,
+        "ymax": 550.0,
+        "xmax": 450.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 390.0,
+        "xmin": 390.0,
+        "ymax": 410.0,
+        "xmax": 420.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 550.0,
+        "xmin": 560.0,
+        "ymax": 590.0,
+        "xmax": 690.0,
+        "label": "Plastic (Bottle)"
+      },
+      {
+        "ymin": 270.0,
+        "xmin": 490.0,
+        "ymax": 320.0,
+        "xmax": 530.0,
+        "label": "Plastic (Bottle)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:04:32.957684",
+    "waste_distribution": {
+      "Plastic": 4,
+      "Other": 1
+    },
+    "unique_item_count": 5,
+    "id": "1769792672957",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Wood"
+    ],
+    "category": "Wood",
+    "subCategory": "Stick",
+    "severity": "MEDIUM",
+    "description": "The beach shows scattered natural debris including sticks and small branches, with some minor litter visible.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 840.0,
+        "xmin": 30.0,
+        "ymax": 900.0,
+        "xmax": 270.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 690.0,
+        "xmin": 450.0,
+        "ymax": 720.0,
+        "xmax": 500.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 580.0,
+        "xmin": 600.0,
+        "ymax": 620.0,
+        "xmax": 650.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 450.0,
+        "xmin": 350.0,
+        "ymax": 470.0,
+        "xmax": 400.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 350.0,
+        "xmin": 200.0,
+        "ymax": 370.0,
+        "xmax": 250.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 280.0,
+        "xmin": 100.0,
+        "ymax": 300.0,
+        "xmax": 150.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 750.0,
+        "xmin": 700.0,
+        "ymax": 750.0,
+        "xmax": 750.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 800.0,
+        "ymax": 850.0,
+        "xmax": 850.0,
+        "label": "Wood (Stick)"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 500.0,
+        "ymax": 950.0,
+        "xmax": 550.0,
+        "label": "Wood (Stick)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:06:16.316332",
+    "waste_distribution": {
+      "Wood": 12,
+      "Plastic": 2,
+      "Other": 1
+    },
+    "unique_item_count": 15,
+    "id": "1769792776316",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Wood"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "\u5305\u88c5\u888b",
+    "severity": "MEDIUM",
+    "description": "\u6d77\u6ee9\u4e0a\u6563\u843d\u7740\u5851\u6599\u5305\u88c5\u888b\u3001\u6728\u68cd\u548c\u5176\u4ed6\u6742\u7269\uff0c\u73af\u5883\u53d7\u5230\u8f7b\u5fae\u6c61\u67d3\u3002",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 720.0,
+        "xmin": 420.0,
+        "ymax": 960.0,
+        "xmax": 580.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 0.0,
+        "xmin": 0.0,
+        "ymax": 900.0,
+        "xmax": 300.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 0.0,
+        "xmin": 200.0,
+        "ymax": 320.0,
+        "xmax": 330.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 100.0,
+        "xmin": 120.0,
+        "ymax": 160.0,
+        "xmax": 160.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 300.0,
+        "xmin": 280.0,
+        "ymax": 320.0,
+        "xmax": 300.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 380.0,
+        "ymax": 420.0,
+        "xmax": 400.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 500.0,
+        "xmin": 480.0,
+        "ymax": 520.0,
+        "xmax": 500.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 600.0,
+        "xmin": 580.0,
+        "ymax": 620.0,
+        "xmax": 600.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 700.0,
+        "xmin": 680.0,
+        "ymax": 720.0,
+        "xmax": 700.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 780.0,
+        "ymax": 820.0,
+        "xmax": 800.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 880.0,
+        "ymax": 920.0,
+        "xmax": 900.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 1000.0,
+        "xmin": 980.0,
+        "ymax": 1020.0,
+        "xmax": 1000.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 1100.0,
+        "xmin": 1080.0,
+        "ymax": 1120.0,
+        "xmax": 1100.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 1200.0,
+        "xmin": 1180.0,
+        "ymax": 1220.0,
+        "xmax": 1200.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      },
+      {
+        "ymin": 1300.0,
+        "xmin": 1280.0,
+        "ymax": 1320.0,
+        "xmax": 1300.0,
+        "label": "Plastic (\u5305\u88c5\u888b)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:07:48.818472",
+    "waste_distribution": {
+      "Plastic": 8,
+      "Wood": 4,
+      "Other": 3
+    },
+    "unique_item_count": 15,
+    "id": "1769792868818",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A discarded plastic container, a metal can, and a tennis ball are visible among natural debris on a rocky surface.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 270.0,
+        "xmin": 300.0,
+        "ymax": 790.0,
+        "xmax": 540.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 360.0,
+        "xmin": 400.0,
+        "ymax": 680.0,
+        "xmax": 740.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 890.0,
+        "xmin": 550.0,
+        "ymax": 1050.0,
+        "xmax": 690.0,
+        "label": "Plastic (Container)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:09:38.608654",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Rubber": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769792978608",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "Various plastic containers and debris scattered on a gravelly beach, mixed with natural leaves and small rocks.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 278.0,
+        "xmin": 135.0,
+        "ymax": 362.0,
+        "xmax": 429.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 128.0,
+        "xmin": 73.0,
+        "ymax": 208.0,
+        "xmax": 352.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 108.0,
+        "xmin": 18.0,
+        "ymax": 155.0,
+        "xmax": 116.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 655.0,
+        "xmin": 385.0,
+        "ymax": 735.0,
+        "xmax": 475.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 530.0,
+        "xmin": 400.0,
+        "ymax": 580.0,
+        "xmax": 450.0,
+        "label": "Plastic (Container)"
+      },
+      {
+        "ymin": 495.0,
+        "xmin": 715.0,
+        "ymax": 565.0,
+        "xmax": 795.0,
+        "label": "Plastic (Container)"
+      }
+    ],
+    "timestamp": "2026-01-31T01:14:04.027628",
+    "waste_distribution": {
+      "Plastic": 4,
+      "Other": 2
+    },
+    "unique_item_count": 6,
+    "id": "1769793244027",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle Cap",
+    "severity": "MEDIUM",
+    "description": "A discarded plastic bottle cap with a red rim lies among rocks, driftwood, and other debris on a coastal area.",
+    "estimatedWeightKg": 0.02,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 640.0,
+        "xmin": 250.0,
+        "ymax": 820.0,
+        "xmax": 400.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-01-31T10:53:09.691565",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Wood": 5,
+      "Other": 3
+    },
+    "unique_item_count": 1,
+    "id": "1769827989691",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A discarded plastic container, a metal can, and a tennis ball are among the waste items found on a rocky coastal area.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 278.0,
+        "xmin": 346.0,
+        "ymax": 595.0,
+        "xmax": 716.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 536.0,
+        "xmin": 316.0,
+        "ymax": 765.0,
+        "xmax": 518.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 893.0,
+        "xmin": 532.0,
+        "ymax": 1050.0,
+        "xmax": 684.0,
+        "label": "Rubber"
+      }
+    ],
+    "timestamp": "2026-01-31T10:54:30.592822",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Rubber": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769828070592",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A discarded plastic bottle and other debris, including a spoon and an orange container, are scattered on a rocky beach area.",
+    "estimatedWeightKg": 0.25,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 480.0,
+        "xmin": 470.0,
+        "ymax": 660.0,
+        "xmax": 620.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 340.0,
+        "xmin": 340.0,
+        "ymax": 490.0,
+        "xmax": 450.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 920.0,
+        "xmin": 160.0,
+        "ymax": 1100.0,
+        "xmax": 300.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-01-31T10:55:06.718167",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Other": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769828106718",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A broken brown glass bottle neck and a crumpled blue and white paper item lie on sandy beach, indicating minor littering.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 145.0,
+        "xmin": 430.0,
+        "ymax": 515.0,
+        "xmax": 640.0,
+        "label": "Glass"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 410.0,
+        "ymax": 1160.0,
+        "xmax": 630.0,
+        "label": "Paper"
+      }
+    ],
+    "timestamp": "2026-01-31T10:55:40.958386",
+    "waste_distribution": {
+      "Glass": 1,
+      "Paper": 1
+    },
+    "unique_item_count": 2,
+    "id": "1769828140958",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A coastal area littered with various plastic waste items, including a yellow container, blue plastic pieces, and foam fragments, amidst dense vegetation.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 746.0,
+        "xmin": 532.0,
+        "ymax": 928.0,
+        "xmax": 730.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 528.0,
+        "xmin": 132.0,
+        "ymax": 658.0,
+        "xmax": 240.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 1100.0,
+        "xmin": 30.0,
+        "ymax": 1280.0,
+        "xmax": 150.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 950.0,
+        "xmin": 200.0,
+        "ymax": 1080.0,
+        "xmax": 280.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 480.0,
+        "xmin": 180.0,
+        "ymax": 520.0,
+        "xmax": 220.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 320.0,
+        "xmin": 280.0,
+        "ymax": 360.0,
+        "xmax": 320.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 680.0,
+        "xmin": 420.0,
+        "ymax": 685.0,
+        "xmax": 460.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 500.0,
+        "ymax": 805.0,
+        "xmax": 520.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 1000.0,
+        "xmin": 600.0,
+        "ymax": 1050.0,
+        "xmax": 680.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 300.0,
+        "xmin": 360.0,
+        "ymax": 340.0,
+        "xmax": 400.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-01-31T10:57:35.622200",
+    "waste_distribution": {
+      "Plastic": 7,
+      "Other": 3
+    },
+    "unique_item_count": 10,
+    "id": "1769828255622",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bag",
+    "severity": "MEDIUM",
+    "description": "A crumpled plastic bag lies among rocks and seaweed on a coastal area, contributing to marine pollution.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 520.0,
+        "xmin": 340.0,
+        "ymax": 890.0,
+        "xmax": 570.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-01-31T10:59:12.598059",
+    "waste_distribution": {
+      "Plastic": 1
+    },
+    "unique_item_count": 1,
+    "id": "1769828352598",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A small white and green plastic container, likely for laundry detergent or similar products, discarded on a rocky beach.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 700.0,
+        "xmin": 350.0,
+        "ymax": 940.0,
+        "xmax": 600.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-01-31T11:14:44.355875",
+    "waste_distribution": {
+      "Plastic": 1
+    },
+    "unique_item_count": 1,
+    "id": "1769829284356",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bag",
+    "severity": "MEDIUM",
+    "description": "A crumpled plastic bag lies among rocks and seaweed on a coastal area, contributing to marine pollution.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 520.0,
+        "xmin": 340.0,
+        "ymax": 870.0,
+        "xmax": 560.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-01-31T11:17:37.209240",
+    "waste_distribution": {
+      "Plastic": 1
+    },
+    "unique_item_count": 1,
+    "id": "1769829457209",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "Various plastic waste items including a bottle, a foam container, a plastic bag, and a metal can scattered on the sandy beach.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 480.0,
+        "xmin": 290.0,
+        "ymax": 520.0,
+        "xmax": 390.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 540.0,
+        "ymax": 450.0,
+        "xmax": 620.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 370.0,
+        "xmin": 700.0,
+        "ymax": 420.0,
+        "xmax": 820.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 520.0,
+        "xmin": 680.0,
+        "ymax": 550.0,
+        "xmax": 710.0,
+        "label": "Metal"
+      }
+    ],
+    "timestamp": "2026-01-31T11:18:27.999970",
+    "waste_distribution": {
+      "Plastic": 3,
+      "Metal": 1
+    },
+    "unique_item_count": 4,
+    "id": "1769829508000",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "Various plastic waste items including a broken bottle, a cap, and other debris scattered on the sandy beach.",
+    "estimatedWeightKg": 0.25,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 160.0,
+        "xmin": 80.0,
+        "ymax": 430.0,
+        "xmax": 390.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 450.0,
+        "xmin": 370.0,
+        "ymax": 690.0,
+        "xmax": 630.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 1060.0,
+        "xmin": 440.0,
+        "ymax": 1300.0,
+        "xmax": 840.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 0.0,
+        "xmin": 0.0,
+        "ymax": 100.0,
+        "xmax": 370.0,
+        "label": "Fabric"
+      }
+    ],
+    "timestamp": "2026-01-31T11:24:24.064231",
+    "waste_distribution": {
+      "Plastic": 3,
+      "Other": 1
+    },
+    "unique_item_count": 4,
+    "id": "1769829864064",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle and Containers",
+    "severity": "MEDIUM",
+    "description": "Coastal waste includes plastic bottles, containers, and other debris scattered on the sand.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 980.0,
+        "xmin": 390.0,
+        "ymax": 1147.0,
+        "xmax": 738.0,
+        "label": "Plastic Bottle"
+      },
+      {
+        "ymin": 250.0,
+        "xmin": 75.0,
+        "ymax": 398.0,
+        "xmax": 325.0,
+        "label": "Plastic Container"
+      },
+      {
+        "ymin": 145.0,
+        "xmin": 135.0,
+        "ymax": 330.0,
+        "xmax": 420.0,
+        "label": "Plastic Container"
+      },
+      {
+        "ymin": 0.0,
+        "xmin": 0.0,
+        "ymax": 140.0,
+        "xmax": 335.0,
+        "label": "Fabric Debris"
+      },
+      {
+        "ymin": 420.0,
+        "xmin": 275.0,
+        "ymax": 635.0,
+        "xmax": 555.0,
+        "label": "Rock (Not Waste)"
+      },
+      {
+        "ymin": 470.0,
+        "xmin": 550.0,
+        "ymax": 570.0,
+        "xmax": 750.0,
+        "label": "Wooden Stick"
+      }
+    ],
+    "timestamp": "2026-01-31T11:28:08.113497",
+    "waste_distribution": {
+      "Plastic": 4,
+      "Fabric": 1,
+      "Wood": 1
+    },
+    "unique_item_count": 6,
+    "id": "1769830088113",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "Coastal waste includes a plastic container, a tennis ball, and other small debris scattered on the rocky shore.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 250.0,
+        "xmin": 300.0,
+        "ymax": 600.0,
+        "xmax": 620.0,
+        "label": "Plastic Container"
+      },
+      {
+        "ymin": 480.0,
+        "xmin": 240.0,
+        "ymax": 720.0,
+        "xmax": 460.0,
+        "label": "Metal Can"
+      },
+      {
+        "ymin": 820.0,
+        "xmin": 440.0,
+        "ymax": 950.0,
+        "xmax": 570.0,
+        "label": "Tennis Ball"
+      },
+      {
+        "ymin": 1050.0,
+        "xmin": 120.0,
+        "ymax": 1100.0,
+        "xmax": 200.0,
+        "label": "Small Debris"
+      }
+    ],
+    "timestamp": "2026-01-31T11:33:37.275882",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Other": 2
+    },
+    "unique_item_count": 4,
+    "id": "1769830417276",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A plastic container, a metal can, and a tennis ball are scattered among rocks and leaves on a coastal area.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 380.0,
+        "xmin": 290.0,
+        "ymax": 760.0,
+        "xmax": 540.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 270.0,
+        "xmin": 350.0,
+        "ymax": 650.0,
+        "xmax": 750.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 890.0,
+        "xmin": 530.0,
+        "ymax": 1050.0,
+        "xmax": 690.0,
+        "label": "Rubber"
+      }
+    ],
+    "timestamp": "2026-01-31T11:34:37.179668",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Rubber": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769830477179",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A plastic container, a metal can, and a tennis ball are scattered among rocks and leaves on a coastal area.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 300.0,
+        "xmin": 350.0,
+        "ymax": 500.0,
+        "xmax": 600.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 550.0,
+        "xmin": 300.0,
+        "ymax": 700.0,
+        "xmax": 450.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 850.0,
+        "xmin": 550.0,
+        "ymax": 950.0,
+        "xmax": 650.0,
+        "label": "Rubber"
+      }
+    ],
+    "timestamp": "2026-01-31T11:37:24.298532",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Metal": 1,
+      "Rubber": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769830644298",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A plastic container, a metal can, and a tennis ball are among the waste items found on a rocky, leaf-strewn coastal area.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 280.0,
+        "xmin": 320.0,
+        "ymax": 490.0,
+        "xmax": 690.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 530.0,
+        "xmin": 300.0,
+        "ymax": 740.0,
+        "xmax": 490.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 880.0,
+        "xmin": 510.0,
+        "ymax": 1020.0,
+        "xmax": 650.0,
+        "label": "Rubber"
+      }
+    ],
+    "timestamp": "2026-01-31T11:38:54.854526",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Metal": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769830734854",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "Scattered plastic waste including a bottle, a foam container, a plastic bag, and a metal can on a sandy beach.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 500.0,
+        "xmin": 300.0,
+        "ymax": 550.0,
+        "xmax": 400.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 550.0,
+        "ymax": 450.0,
+        "xmax": 620.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 350.0,
+        "xmin": 700.0,
+        "ymax": 400.0,
+        "xmax": 820.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 550.0,
+        "xmin": 700.0,
+        "ymax": 580.0,
+        "xmax": 730.0,
+        "label": "Metal"
+      }
+    ],
+    "timestamp": "2026-01-31T11:39:45.613238",
+    "waste_distribution": {
+      "Plastic": 3,
+      "Metal": 1
+    },
+    "unique_item_count": 4,
+    "id": "1769830785613",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "Scattered plastic waste including a bottle, a foam container, a plastic bag, and a metal can on a sandy beach.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 500.0,
+        "xmin": 300.0,
+        "ymax": 550.0,
+        "xmax": 420.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 450.0,
+        "xmin": 570.0,
+        "ymax": 500.0,
+        "xmax": 650.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 710.0,
+        "ymax": 480.0,
+        "xmax": 850.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 550.0,
+        "xmin": 700.0,
+        "ymax": 590.0,
+        "xmax": 740.0,
+        "label": "Metal"
+      }
+    ],
+    "timestamp": "2026-01-31T11:40:23.185609",
+    "waste_distribution": {
+      "Plastic": 3,
+      "Metal": 1
+    },
+    "unique_item_count": 4,
+    "id": "1769830823185",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A broken brown glass bottle neck and a crumpled blue and white paper item are scattered on the sandy beach.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 180.0,
+        "xmin": 430.0,
+        "ymax": 510.0,
+        "xmax": 640.0,
+        "label": "Glass"
+      },
+      {
+        "ymin": 790.0,
+        "xmin": 410.0,
+        "ymax": 1160.0,
+        "xmax": 650.0,
+        "label": "Paper"
+      }
+    ],
+    "timestamp": "2026-01-31T11:41:03.027827",
+    "waste_distribution": {
+      "Glass": 1,
+      "Paper": 1
+    },
+    "unique_item_count": 2,
+    "id": "1769830863027",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A blue glass bottle lies amidst dry vegetation and other debris, indicating littering in a natural coastal environment.",
+    "estimatedWeightKg": 0.3,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 250.0,
+        "xmin": 400.0,
+        "ymax": 760.0,
+        "xmax": 660.0,
+        "label": "Glass"
+      },
+      {
+        "ymin": 40.0,
+        "xmin": 500.0,
+        "ymax": 150.0,
+        "xmax": 650.0,
+        "label": "Metal"
+      }
+    ],
+    "timestamp": "2026-01-31T15:02:58.453077",
+    "waste_distribution": {
+      "Glass": 1,
+      "Metal": 1
+    },
+    "unique_item_count": 2,
+    "id": "1769842978453",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Rubber"
+    ],
+    "category": "Rubber",
+    "subCategory": "Flip-flop",
+    "severity": "MEDIUM",
+    "description": "A discarded blue flip-flop with green straps lies among rocks, wood, and other debris on a coastal area.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 140.0,
+        "xmin": 280.0,
+        "ymax": 320.0,
+        "xmax": 460.0,
+        "label": "Flip-flop"
+      },
+      {
+        "ymin": 440.0,
+        "xmin": 250.0,
+        "ymax": 750.0,
+        "xmax": 530.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 380.0,
+        "xmin": 300.0,
+        "ymax": 530.0,
+        "xmax": 550.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 90.0,
+        "xmin": 100.0,
+        "ymax": 150.0,
+        "xmax": 180.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 50.0,
+        "xmin": 50.0,
+        "ymax": 100.0,
+        "xmax": 100.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-01-31T15:03:44.400237",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Wood": 1,
+      "Rubber": 1,
+      "Other": 1
+    },
+    "unique_item_count": 5,
+    "id": "1769843024400",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Rubber"
+  },
+  {
+    "wasteType": [
+      "Metal"
+    ],
+    "category": "Metal",
+    "subCategory": "Balloon",
+    "severity": "MEDIUM",
+    "description": "Deflated metallic foil balloons and other debris scattered on a sandy beach.",
+    "estimatedWeightKg": 0.2,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 498.0,
+        "xmin": 67.0,
+        "ymax": 860.0,
+        "xmax": 705.0,
+        "label": "Balloon"
+      },
+      {
+        "ymin": 394.0,
+        "xmin": 161.0,
+        "ymax": 505.0,
+        "xmax": 537.0,
+        "label": "Balloon"
+      },
+      {
+        "ymin": 896.0,
+        "xmin": 256.0,
+        "ymax": 972.0,
+        "xmax": 316.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 779.0,
+        "xmin": 372.0,
+        "ymax": 846.0,
+        "xmax": 447.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 735.0,
+        "xmin": 699.0,
+        "ymax": 826.0,
+        "xmax": 761.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-01-31T15:04:21.857281",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 3,
+      "Wood": 1
+    },
+    "unique_item_count": 5,
+    "id": "1769843061857",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Metal"
+  },
+  {
+    "wasteType": [
+      "Metal"
+    ],
+    "category": "Metal",
+    "subCategory": "Electronics",
+    "severity": "MEDIUM",
+    "description": "A large, rusted metal electronic device washed up on a rocky beach, surrounded by smaller debris.",
+    "estimatedWeightKg": 15.0,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 370.0,
+        "xmin": 340.0,
+        "ymax": 890.0,
+        "xmax": 720.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 600.0,
+        "xmin": 750.0,
+        "ymax": 820.0,
+        "xmax": 930.0,
+        "label": "Fabric"
+      },
+      {
+        "ymin": 540.0,
+        "xmin": 190.0,
+        "ymax": 610.0,
+        "xmax": 320.0,
+        "label": "Paper"
+      },
+      {
+        "ymin": 920.0,
+        "xmin": 650.0,
+        "ymax": 1000.0,
+        "xmax": 950.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 850.0,
+        "xmin": 750.0,
+        "ymax": 950.0,
+        "xmax": 850.0,
+        "label": "Wood"
+      }
+    ],
+    "timestamp": "2026-01-31T15:05:03.980557",
+    "waste_distribution": {
+      "Metal": 1,
+      "Wood": 2,
+      "Plastic": 1,
+      "Fabric": 1
+    },
+    "unique_item_count": 5,
+    "id": "1769843103980",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Metal"
+  },
+  {
+    "wasteType": [
+      "Fabric"
+    ],
+    "category": "Fabric",
+    "subCategory": "Tarp",
+    "severity": "MEDIUM",
+    "description": "A torn blue fabric tarp lies amidst debris on a rocky, leaf-strewn ground, likely coastal waste.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 280.0,
+        "xmin": 0.0,
+        "ymax": 1140.0,
+        "xmax": 930.0,
+        "label": "Fabric"
+      }
+    ],
+    "timestamp": "2026-01-31T15:05:54.529124",
+    "waste_distribution": {
+      "Fabric": 1
+    },
+    "unique_item_count": 1,
+    "id": "1769843154529",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Fabric"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A yellow plastic container and a black plastic lid lie on sandy ground, surrounded by dry vegetation and other debris.",
+    "estimatedWeightKg": 0.1,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 350.0,
+        "xmin": 100.0,
+        "ymax": 760.0,
+        "xmax": 640.0,
+        "label": "Black Plastic Lid"
+      },
+      {
+        "ymin": 700.0,
+        "xmin": 380.0,
+        "ymax": 900.0,
+        "xmax": 740.0,
+        "label": "Yellow Plastic Container"
+      }
+    ],
+    "timestamp": "2026-01-31T15:06:57.726141",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Wood": 1
+    },
+    "unique_item_count": 2,
+    "id": "1769843217726",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A coastal area littered with plastic waste, including bottles and foam debris, amidst dense vegetation.",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "High",
+    "boundingBoxes": [
+      {
+        "ymin": 980.0,
+        "xmin": 20.0,
+        "ymax": 1200.0,
+        "xmax": 160.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 520.0,
+        "xmin": 140.0,
+        "ymax": 650.0,
+        "xmax": 240.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 600.0,
+        "ymax": 900.0,
+        "xmax": 740.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 400.0,
+        "xmin": 300.0,
+        "ymax": 450.0,
+        "xmax": 350.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 200.0,
+        "xmin": 400.0,
+        "ymax": 250.0,
+        "xmax": 450.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 100.0,
+        "xmin": 500.0,
+        "ymax": 150.0,
+        "xmax": 550.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 100.0,
+        "ymax": 900.0,
+        "xmax": 200.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-01-31T15:08:03.251547",
+    "waste_distribution": {
+      "Plastic": 7,
+      "Other": 3
+    },
+    "unique_item_count": 10,
+    "id": "1769843283251",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": null,
+    "severity": "MEDIUM",
+    "description": "The video shows a moderate amount of waste on the coastal area, primarily consisting of plastic bottles and other debris. The presence of wood and metal items indicates human activity in the area. Cleanup is recommended to prevent further environmental degradation.",
+    "estimatedWeightKg": 11.75,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 200.0,
+        "xmin": 100.0,
+        "ymax": 300.0,
+        "xmax": 200.0,
+        "label": "Plastic Bottle"
+      },
+      {
+        "ymin": 350.0,
+        "xmin": 250.0,
+        "ymax": 450.0,
+        "xmax": 350.0,
+        "label": "Wood Stick"
+      },
+      {
+        "ymin": 500.0,
+        "xmin": 400.0,
+        "ymax": 600.0,
+        "xmax": 500.0,
+        "label": "Metal Can"
+      }
+    ],
+    "timestamp": "2026-01-31T15:49:04.968898",
+    "waste_distribution": {
+      "Plastic": 6,
+      "Wood": 2,
+      "Metal": 1,
+      "Other": 1
+    },
+    "unique_item_count": 10,
+    "id": "1769845744969",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A mix of plastic waste including a clear plastic container, a metal can, and a rubber tennis ball found on a rocky coastal area with scattered leaves and debris.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 280.0,
+        "xmin": 300.0,
+        "ymax": 450.0,
+        "xmax": 700.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 550.0,
+        "xmin": 320.0,
+        "ymax": 750.0,
+        "xmax": 500.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 550.0,
+        "ymax": 1050.0,
+        "xmax": 680.0,
+        "label": "Rubber"
+      }
+    ],
+    "timestamp": "2026-01-31T16:04:13.307400",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Rubber": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769846653307",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "A discarded plastic bottle and other debris, including a spoon and an orange container, are scattered on a rocky beach area.",
+    "estimatedWeightKg": 0.25,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 490.0,
+        "xmin": 480.0,
+        "ymax": 670.0,
+        "xmax": 620.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 390.0,
+        "xmin": 340.0,
+        "ymax": 490.0,
+        "xmax": 430.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 160.0,
+        "ymax": 1100.0,
+        "xmax": 300.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-01-31T16:20:35.962379",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Other": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769847635962",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Container",
+    "severity": "MEDIUM",
+    "description": "A mix of plastic waste including a container and a can, scattered among natural debris on a rocky surface.",
+    "estimatedWeightKg": 0.3,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 370.0,
+        "xmin": 350.0,
+        "ymax": 680.0,
+        "xmax": 540.0,
+        "label": "Can"
+      },
+      {
+        "ymin": 280.0,
+        "xmin": 380.0,
+        "ymax": 620.0,
+        "xmax": 710.0,
+        "label": "Container"
+      },
+      {
+        "ymin": 890.0,
+        "xmin": 530.0,
+        "ymax": 1050.0,
+        "xmax": 680.0,
+        "label": "Rubber"
+      }
+    ],
+    "timestamp": "2026-01-31T18:03:10.287909",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Metal": 1
+    },
+    "unique_item_count": 3,
+    "id": "1769853790288",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Litter",
+    "severity": "MEDIUM",
+    "description": "Small pieces of litter scattered on the sidewalk near the curb, including paper and possibly food wrappers.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 100.0,
+        "xmin": 900.0,
+        "ymax": 120.0,
+        "xmax": 920.0,
+        "label": "Paper"
+      },
+      {
+        "ymin": 110.0,
+        "xmin": 880.0,
+        "ymax": 130.0,
+        "xmax": 900.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 120.0,
+        "xmin": 860.0,
+        "ymax": 140.0,
+        "xmax": 880.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 130.0,
+        "xmin": 840.0,
+        "ymax": 150.0,
+        "xmax": 860.0,
+        "label": "Paper"
+      },
+      {
+        "ymin": 140.0,
+        "xmin": 820.0,
+        "ymax": 160.0,
+        "xmax": 840.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-02-01T23:21:03.626784",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Paper": 2,
+      "Other": 1
+    },
+    "unique_item_count": 5,
+    "id": "1769959263627",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "MEDIUM",
+    "description": "A small amount of general debris is visible on the ground near the pathway, likely left by visitors.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 550.0,
+        "xmin": 950.0,
+        "ymax": 580.0,
+        "xmax": 980.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 600.0,
+        "xmin": 1000.0,
+        "ymax": 620.0,
+        "xmax": 1030.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-02-01T23:26:21.842644",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Other": 1
+    },
+    "unique_item_count": 2,
+    "id": "1769959581842",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Fabric"
+    ],
+    "category": "Fabric",
+    "subCategory": "Handbag",
+    "severity": "MEDIUM",
+    "description": "A light pink fabric handbag with a textured surface and metal chain strap, displayed in a retail setting.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 200.0,
+        "xmin": 180.0,
+        "ymax": 840.0,
+        "xmax": 820.0,
+        "label": "Handbag"
+      }
+    ],
+    "timestamp": "2026-02-01T23:28:28.736233",
+    "waste_distribution": {
+      "Fabric": 1
+    },
+    "unique_item_count": 1,
+    "id": "1769959708736",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Fabric"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Miscellaneous waste",
+    "severity": "MEDIUM",
+    "description": "Small pieces of litter scattered on the platform near the tracks.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 600.0,
+        "xmin": 100.0,
+        "ymax": 620.0,
+        "xmax": 120.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 620.0,
+        "xmin": 200.0,
+        "ymax": 640.0,
+        "xmax": 220.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 700.0,
+        "xmin": 300.0,
+        "ymax": 720.0,
+        "xmax": 320.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 720.0,
+        "xmin": 400.0,
+        "ymax": 740.0,
+        "xmax": 420.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 740.0,
+        "xmin": 500.0,
+        "ymax": 520.0,
+        "xmax": 520.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-01T23:34:07.633683",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Other": 3
+    },
+    "unique_item_count": 5,
+    "id": "1769960047633",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Miscellaneous",
+    "severity": "MEDIUM",
+    "description": "A few small pieces of litter scattered on the ground in a busy urban area.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 750.0,
+        "xmin": 800.0,
+        "ymax": 800.0,
+        "xmax": 850.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 650.0,
+        "xmin": 900.0,
+        "ymax": 700.0,
+        "xmax": 950.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 950.0,
+        "ymax": 850.0,
+        "xmax": 1000.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-01T23:48:18.512446",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Other": 2
+    },
+    "unique_item_count": 3,
+    "id": "1769960898512",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Miscellaneous",
+    "severity": "LOW",
+    "description": "The image shows a subway train interior with passengers. There is no visible coastal waste in the image.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-02T14:52:17.809749",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770015137809",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Paper"
+    ],
+    "category": "Paper",
+    "subCategory": "Carton",
+    "severity": "MEDIUM",
+    "description": "Detected Paper (Backup Mode: API Error: BadRequest.TooLarge - Exceeded limit on...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 307.0,
+        "xmin": 214.0,
+        "ymax": 457.0,
+        "xmax": 364.0,
+        "label": "Paper"
+      }
+    ],
+    "timestamp": "2026-02-02T14:55:47.660191",
+    "waste_distribution": {
+      "Paper": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770015347660",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Paper"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Shard",
+    "severity": "MEDIUM",
+    "description": "Detected Glass (Backup Mode: HTTPSConnectionPool(host='dashscope.aliyuncs.com',...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 599.0,
+        "xmin": 466.0,
+        "ymax": 749.0,
+        "xmax": 616.0,
+        "label": "Glass"
+      },
+      {
+        "ymin": 230.0,
+        "xmin": 443.0,
+        "ymax": 380.0,
+        "xmax": 593.0,
+        "label": "Glass"
+      }
+    ],
+    "timestamp": "2026-02-02T14:58:42.389769",
+    "waste_distribution": {
+      "Glass": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770015522389",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Vehicle",
+    "severity": "LOW",
+    "description": "A luxury white SUV parked on a brick-paved street in an urban area. No visible waste is present in the image.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-02T15:01:54.333290",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770015714333",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Waste",
+    "severity": "LOW",
+    "description": "The image depicts a train station with no visible waste. The area appears clean, with no litter or debris present on the platforms or tracks.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-03T20:12:10.216962",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770120730217",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Waste",
+    "severity": "LOW",
+    "description": "The image shows a train station with no visible waste on the ground or in the immediate area. The station appears clean and well-maintained.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-04T22:05:39.335418",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770213939337",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal residential area with no visible waste on the road or surrounding areas. The environment appears clean and well-maintained.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-04T22:10:24.217698",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770214224217",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "LOW",
+    "description": "The image shows a quiet street with parked cars and some overgrown grass. There is no visible waste or debris on the ground, but there are some minor signs of neglect such as overgrown vegetation and possibly some litter near the utility pole.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 630.0,
+        "xmin": 0.0,
+        "ymax": 740.0,
+        "xmax": 860.0,
+        "label": "Vegetation"
+      },
+      {
+        "ymin": 580.0,
+        "xmin": 400.0,
+        "ymax": 610.0,
+        "xmax": 450.0,
+        "label": "Litter"
+      }
+    ],
+    "timestamp": "2026-02-04T22:11:53.803436",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Other": 1
+    },
+    "unique_item_count": 2,
+    "id": "1770214313803",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Waste",
+    "severity": "LOW",
+    "description": "The image shows a coastal area with some visible waste, including plastic bottles and other debris scattered near the shoreline. The waste appears to be minimal and not significantly impacting the environment.",
+    "estimatedWeightKg": 2.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 900.0,
+        "xmin": 100.0,
+        "ymax": 1000.0,
+        "xmax": 200.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 850.0,
+        "xmin": 200.0,
+        "ymax": 950.0,
+        "xmax": 300.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-04T22:14:27.123407",
+    "waste_distribution": {
+      "Plastic": 3,
+      "Other": 2
+    },
+    "unique_item_count": 5,
+    "id": "1770214467123",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bottle",
+    "severity": "LOW",
+    "description": "A plastic bottle is visible on the table, likely discarded waste.",
+    "estimatedWeightKg": 0.2,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 800.0,
+        "xmin": 100.0,
+        "ymax": 900.0,
+        "xmax": 300.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-02-04T22:17:31.488964",
+    "waste_distribution": {
+      "Plastic": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770214651489",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Paper"
+    ],
+    "category": "Paper",
+    "subCategory": "Cardboard",
+    "severity": "MEDIUM",
+    "description": "Detected Paper (Backup Mode: HTTPSConnectionPool(host='dashscope.aliyuncs.com',...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 565.0,
+        "xmin": 519.0,
+        "ymax": 715.0,
+        "xmax": 669.0,
+        "label": "Paper"
+      }
+    ],
+    "timestamp": "2026-02-07T20:43:48.061507",
+    "waste_distribution": {
+      "Paper": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770468228061",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Paper"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General waste",
+    "severity": "LOW",
+    "description": "A small amount of general waste is visible on the ground near the base of the rock formations.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 930.0,
+        "xmin": 870.0,
+        "ymax": 960.0,
+        "xmax": 900.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 940.0,
+        "xmin": 900.0,
+        "ymax": 960.0,
+        "xmax": 930.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-02-07T22:06:33.765678",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Other": 1
+    },
+    "unique_item_count": 2,
+    "id": "1770473193765",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Bottle",
+    "severity": "MEDIUM",
+    "description": "Detected Glass (Backup Mode: Video processing temporarily disabled for stabilit...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 578.0,
+        "xmin": 331.0,
+        "ymax": 728.0,
+        "xmax": 481.0,
+        "label": "Glass"
+      }
+    ],
+    "timestamp": "2026-02-07T22:08:17.718656",
+    "waste_distribution": {
+      "Glass": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770473297719",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Litter",
+    "severity": "LOW",
+    "description": "A small amount of scattered litter is visible on the ground near the roadside, including a few pieces of debris and possibly some organic waste.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 820.0,
+        "xmin": 500.0,
+        "ymax": 850.0,
+        "xmax": 550.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 700.0,
+        "xmin": 600.0,
+        "ymax": 730.0,
+        "xmax": 650.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 400.0,
+        "ymax": 930.0,
+        "xmax": 450.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 850.0,
+        "xmin": 700.0,
+        "ymax": 880.0,
+        "xmax": 750.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 300.0,
+        "ymax": 830.0,
+        "xmax": 350.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-07T22:17:26.883609",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Other": 4
+    },
+    "unique_item_count": 5,
+    "id": "1770473846883",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal view with no visible waste in the foreground or on the water. The scene is clean, with a focus on the skyline and architectural elements.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-07T22:24:08.161812",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770474248162",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a rural area with flooded fields and some scattered debris, but no significant waste is visible.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 680.0,
+        "xmin": 100.0,
+        "ymax": 750.0,
+        "xmax": 200.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 430.0,
+        "xmin": 720.0,
+        "ymax": 460.0,
+        "xmax": 760.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-07T22:39:39.299385",
+    "waste_distribution": {
+      "Plastic": 1,
+      "Other": 1
+    },
+    "unique_item_count": 2,
+    "id": "1770475179299",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal area with a monument and tower, but no visible waste is present.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-07T22:53:17.108658",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770475997108",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal scene with no visible waste. The foreground includes a road barrier, and the background features a city skyline at sunset.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T10:59:54.791019",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770519594791",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal cityscape with no visible waste. The scene includes buildings, a clear sky, and distant mountains, but no specific waste items are apparent.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T11:03:04.054297",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770519784054",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Signs/Markers",
+    "severity": "LOW",
+    "description": "Several small, discarded signs or markers are scattered along the roadside in a desert environment.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 810.0,
+        "xmin": 10.0,
+        "ymax": 860.0,
+        "xmax": 90.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 200.0,
+        "ymax": 840.0,
+        "xmax": 300.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 805.0,
+        "xmin": 400.0,
+        "ymax": 845.0,
+        "xmax": 490.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 630.0,
+        "ymax": 840.0,
+        "xmax": 700.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 860.0,
+        "ymax": 840.0,
+        "xmax": 930.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 1050.0,
+        "ymax": 840.0,
+        "xmax": 1130.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 1250.0,
+        "ymax": 840.0,
+        "xmax": 1300.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T11:16:48.444326",
+    "waste_distribution": {
+      "Other": 7
+    },
+    "unique_item_count": 7,
+    "id": "1770520608444",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal road with no visible waste. The area appears clean, with only natural elements like rocks and mountains in the background.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T11:28:08.474724",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770521288474",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal view with a stone railing in the foreground and a city skyline across the water. There is no visible waste on the beach or in the water.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T11:28:43.430874",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770521323430",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Fabric"
+    ],
+    "category": "Fabric",
+    "subCategory": "Clothing",
+    "severity": "MEDIUM",
+    "description": "Detected Fabric (Backup Mode: HTTPSConnectionPool(host='dashscope.aliyuncs.com',...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 335.0,
+        "xmin": 594.0,
+        "ymax": 485.0,
+        "xmax": 744.0,
+        "label": "Fabric"
+      },
+      {
+        "ymin": 460.0,
+        "xmin": 239.0,
+        "ymax": 610.0,
+        "xmax": 389.0,
+        "label": "Fabric"
+      }
+    ],
+    "timestamp": "2026-02-08T11:31:55.645291",
+    "waste_distribution": {
+      "Fabric": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770521515645",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Fabric"
+  },
+  {
+    "wasteType": [
+      "Glass"
+    ],
+    "category": "Glass",
+    "subCategory": "Shard",
+    "severity": "MEDIUM",
+    "description": "Detected Glass (Backup Mode: ('Connection aborted.', ConnectionResetError(10054...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 426.0,
+        "xmin": 578.0,
+        "ymax": 576.0,
+        "xmax": 728.0,
+        "label": "Glass"
+      },
+      {
+        "ymin": 322.0,
+        "xmin": 589.0,
+        "ymax": 472.0,
+        "xmax": 739.0,
+        "label": "Glass"
+      }
+    ],
+    "timestamp": "2026-02-08T11:35:27.823853",
+    "waste_distribution": {
+      "Glass": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770521727823",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Glass"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a quiet street with parked cars and some overgrown grass. There is no visible waste or debris on the ground, indicating a clean environment.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T11:36:46.629772",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770521806629",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "LOW",
+    "description": "The image depicts a busy urban street scene with no visible waste on the ground or in the immediate vicinity. The area appears clean, with pedestrians and vehicles moving along the cobblestone path and road.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T11:37:24.553768",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770521844553",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Miscellaneous waste",
+    "severity": "LOW",
+    "description": "The image shows a desert landscape with scattered small debris items along the roadside. The waste appears to be primarily composed of non-biodegradable materials, possibly including packaging or small litter items.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 800.0,
+        "xmin": 10.0,
+        "ymax": 830.0,
+        "xmax": 60.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 170.0,
+        "ymax": 830.0,
+        "xmax": 240.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 400.0,
+        "ymax": 830.0,
+        "xmax": 460.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 640.0,
+        "ymax": 830.0,
+        "xmax": 700.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 870.0,
+        "ymax": 830.0,
+        "xmax": 930.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 1050.0,
+        "ymax": 830.0,
+        "xmax": 1110.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 1230.0,
+        "ymax": 830.0,
+        "xmax": 1280.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T11:39:10.795484",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Metal": 1,
+      "Other": 4
+    },
+    "unique_item_count": 7,
+    "id": "1770521950795",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Signage/Markers",
+    "severity": "LOW",
+    "description": "Several small, discarded signage markers are placed along the roadside in a desert environment. The markers appear to be made of a composite material and show signs of wear from exposure to the elements.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 800.0,
+        "xmin": 10.0,
+        "ymax": 840.0,
+        "xmax": 90.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 790.0,
+        "xmin": 210.0,
+        "ymax": 830.0,
+        "xmax": 310.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 430.0,
+        "ymax": 820.0,
+        "xmax": 520.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 770.0,
+        "xmin": 640.0,
+        "ymax": 810.0,
+        "xmax": 730.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 760.0,
+        "xmin": 870.0,
+        "ymax": 800.0,
+        "xmax": 960.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 750.0,
+        "xmin": 1040.0,
+        "ymax": 790.0,
+        "xmax": 1130.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 740.0,
+        "xmin": 1240.0,
+        "ymax": 780.0,
+        "xmax": 1300.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T11:45:07.052401",
+    "waste_distribution": {
+      "Other": 7
+    },
+    "unique_item_count": 7,
+    "id": "1770522307052",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Signage/Markers",
+    "severity": "LOW",
+    "description": "Several rectangular markers with numbers and text are placed along the roadside in a desert environment.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 810.0,
+        "xmin": 0.0,
+        "ymax": 845.0,
+        "xmax": 96.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 205.0,
+        "ymax": 835.0,
+        "xmax": 310.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 430.0,
+        "ymax": 835.0,
+        "xmax": 525.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 640.0,
+        "ymax": 835.0,
+        "xmax": 735.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 870.0,
+        "ymax": 835.0,
+        "xmax": 965.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 1040.0,
+        "ymax": 835.0,
+        "xmax": 1140.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 800.0,
+        "xmin": 1230.0,
+        "ymax": 835.0,
+        "xmax": 1300.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T11:46:16.395473",
+    "waste_distribution": {
+      "Other": 7
+    },
+    "unique_item_count": 7,
+    "id": "1770522376395",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Debris",
+    "severity": "LOW",
+    "description": "The image shows a desert landscape with scattered debris along the roadside. The debris appears to be small pieces of various materials, possibly remnants from vehicles or other human activity.",
+    "estimatedWeightKg": 2.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 780.0,
+        "xmin": 10.0,
+        "ymax": 830.0,
+        "xmax": 60.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 200.0,
+        "ymax": 830.0,
+        "xmax": 280.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 400.0,
+        "ymax": 830.0,
+        "xmax": 490.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 600.0,
+        "ymax": 830.0,
+        "xmax": 680.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 830.0,
+        "ymax": 830.0,
+        "xmax": 910.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 1000.0,
+        "ymax": 830.0,
+        "xmax": 1080.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 1100.0,
+        "ymax": 830.0,
+        "xmax": 1180.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 1200.0,
+        "ymax": 830.0,
+        "xmax": 1280.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T11:54:18.237716",
+    "waste_distribution": {
+      "Plastic": 4,
+      "Metal": 2,
+      "Other": 4
+    },
+    "unique_item_count": 10,
+    "id": "1770522858237",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Metal"
+    ],
+    "category": "Metal",
+    "subCategory": "Scrap",
+    "severity": "MEDIUM",
+    "description": "Detected Metal (Backup Mode: ('Connection aborted.', ConnectionResetError(10054...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 423.0,
+        "xmin": 309.0,
+        "ymax": 573.0,
+        "xmax": 459.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 437.0,
+        "xmin": 374.0,
+        "ymax": 587.0,
+        "xmax": 524.0,
+        "label": "Metal"
+      }
+    ],
+    "timestamp": "2026-02-08T12:23:17.860136",
+    "waste_distribution": {
+      "Metal": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770524597860",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Metal"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a coastal view with no visible waste in the water or on the shore. The foreground features a decorative stone railing, and the background includes a city skyline across the water.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T12:26:34.313979",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770524794314",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Plastic"
+    ],
+    "category": "Plastic",
+    "subCategory": "Bag",
+    "severity": "MEDIUM",
+    "description": "Detected Plastic (Backup Mode: ('Connection aborted.', ConnectionResetError(10054...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 526.0,
+        "xmin": 327.0,
+        "ymax": 676.0,
+        "xmax": 477.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 210.0,
+        "xmin": 576.0,
+        "ymax": 360.0,
+        "xmax": 726.0,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": "2026-02-08T12:53:00.357236",
+    "waste_distribution": {
+      "Plastic": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770526380357",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Plastic"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Miscellaneous debris",
+    "severity": "LOW",
+    "description": "The image shows a desert landscape with scattered small debris items along the roadside. The debris appears to be remnants of packaging or small waste materials, possibly from vehicles or visitors.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 780.0,
+        "xmin": 10.0,
+        "ymax": 830.0,
+        "xmax": 70.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 190.0,
+        "ymax": 830.0,
+        "xmax": 280.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 400.0,
+        "ymax": 830.0,
+        "xmax": 490.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 630.0,
+        "ymax": 830.0,
+        "xmax": 710.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 860.0,
+        "ymax": 830.0,
+        "xmax": 950.0,
+        "label": "Other"
+      },
+      {
+        "ymin": 780.0,
+        "xmin": 1080.0,
+        "ymax": 830.0,
+        "xmax": 1170.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T13:03:08.232459",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Other": 4
+    },
+    "unique_item_count": 6,
+    "id": "1770526988232",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Debris",
+    "severity": "LOW",
+    "description": "The image shows a barren, rocky landscape with no visible waste. The area appears to be undeveloped land with some construction or industrial activity in the background.",
+    "estimatedWeightKg": 0.0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": "2026-02-08T13:13:19.452558",
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "id": "1770527599452",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Mixed",
+    "severity": "MEDIUM",
+    "description": "Detected Other (Backup Mode: ('Connection aborted.', ConnectionResetError(10054...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 487.0,
+        "xmin": 526.0,
+        "ymax": 637.0,
+        "xmax": 676.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T13:20:38.086894",
+    "waste_distribution": {
+      "Other": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770528038087",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General debris",
+    "severity": "LOW",
+    "description": "The image shows a barren, undeveloped coastal area with scattered small debris and no significant waste visible. The foreground has some low-lying vegetation and minor litter, while the background features wind turbines and mountains under a clear sky.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 800.0,
+        "xmin": 100.0,
+        "ymax": 840.0,
+        "xmax": 150.0,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 750.0,
+        "xmin": 300.0,
+        "ymax": 790.0,
+        "xmax": 350.0,
+        "label": "Metal"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 500.0,
+        "ymax": 940.0,
+        "xmax": 550.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T13:25:41.311943",
+    "waste_distribution": {
+      "Plastic": 2,
+      "Metal": 1,
+      "Other": 2
+    },
+    "unique_item_count": 5,
+    "id": "1770528341312",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Mixed",
+    "severity": "MEDIUM",
+    "description": "Detected Other (Backup Mode: ('Connection aborted.', ConnectionResetError(10054...)",
+    "estimatedWeightKg": 1.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 577.0,
+        "xmin": 452.0,
+        "ymax": 727.0,
+        "xmax": 602.0,
+        "label": "Other"
+      }
+    ],
+    "timestamp": "2026-02-08T13:28:14.766916",
+    "waste_distribution": {
+      "Other": 1
+    },
+    "unique_item_count": 1,
+    "id": "1770528494767",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other"
+  },
+  {
+    "wasteType": [
+      "Wood"
+    ],
+    "category": "Wood",
+    "subCategory": "Logs",
+    "severity": "LOW",
+    "description": "A small amount of wood debris, including logs and branches, is scattered on the ground near a fence in a dry, mountainous area.",
+    "estimatedWeightKg": 2.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 800.0,
+        "xmin": 700.0,
+        "ymax": 850.0,
+        "xmax": 800.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 750.0,
+        "xmin": 600.0,
+        "ymax": 800.0,
+        "xmax": 700.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 900.0,
+        "xmin": 400.0,
+        "ymax": 950.0,
+        "xmax": 500.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 850.0,
+        "xmin": 300.0,
+        "ymax": 900.0,
+        "xmax": 400.0,
+        "label": "Wood"
+      },
+      {
+        "ymin": 700.0,
+        "xmin": 200.0,
+        "ymax": 750.0,
+        "xmax": 300.0,
+        "label": "Wood"
+      }
+    ],
+    "timestamp": "2026-02-08T13:35:35.303956",
+    "waste_distribution": {
+      "Wood": 5
+    },
+    "unique_item_count": 5,
+    "id": "1770528935304",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Wood"
+  }
+]
