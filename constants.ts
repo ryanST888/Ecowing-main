@@ -28,8 +28,13 @@ export const TRANSLATIONS = {
     homeTechTitle: "Our Solution: Drone Crew",
     homeTechDesc: "A coordinated fleet: Small agile drones with robotic claws for picking up waste on diverse terrains, and larger drones for storage and transport. Powered by YOLO AI.",
     homeAboutTitle: "The Team",
-    homeAboutDesc: "A multidisciplinary powerhouse from CUHK and HKUST. Click to meet the visionaries behind EcoWing.",
+    homeAboutDesc: "A multidisciplinary powerhouse from CUHK, HKUST, CityU and MU. Click to meet the visionaries behind EcoWing.",
+
+    // --- TEAM ROLES ---
     teamRoleCoFounder: "Co-Founder",
+    teamRoleMarketing: "Marketing & Impact",
+    teamRoleTech: "Tech Development",
+
     teamModalFooter: "Fly High to Keep Our Home Clean!",
     detectingLocation: "Detecting your location...",
     locationFound: "Location detected",
@@ -69,8 +74,13 @@ export const TRANSLATIONS = {
     homeTechTitle: "解決方案：無人機隊",
     homeTechDesc: "協同作戰：配備機械爪的小型無人機在復雜地形上靈活收集，大型無人機負責存儲運輸，全由 YOLO AI 驅動。",
     homeAboutTitle: "核心團隊",
-    homeAboutDesc: "來自香港中文大學與科技大學的跨學科團隊。點擊認識我們。",
+    homeAboutDesc: "來自香港中文大學、科技大學、城市大學及都會大學的跨學科團隊。點擊認識我們。",
+
+    // --- TEAM ROLES (ZH) ---
     teamRoleCoFounder: "聯合創始人",
+    teamRoleMarketing: "市場營銷與影響力",
+    teamRoleTech: "技術開發",
+
     teamModalFooter: "Fly High to Keep Our Home Clean!",
     detectingLocation: "正在偵測您的位置...",
     locationFound: "已獲取位置",
@@ -99,6 +109,18 @@ export const TEAM_MEMBERS = [
     roleKey: "teamRoleCoFounder",
     bioEN: "Physics + AI (HKUST)\nEntrepreneur with 10+ tech project experiences",
     bioZH: "香港科技大學物理與人工智能系\n擁有 10+ 項科技項目開發經驗的創業者"
+  },
+  {
+    name: "Shalisa Ho",
+    roleKey: "teamRoleMarketing",
+    bioEN: "Biological Sciences (CityU)\nMarketing & Impact Measurement",
+    bioZH: "香港城市大學生物科學系\n市場營銷與影響力評估"
+  },
+  {
+    name: "Ryan Szeto",
+    roleKey: "teamRoleTech",
+    bioEN: "Data Science (MU)\nTechnology Development",
+    bioZH: "香港都會大學數據科學系\n技術開發"
   }
 ];
 

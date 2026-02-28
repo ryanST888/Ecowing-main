@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, Map as MapIcon, Upload, Menu, X, Home as HomeIcon } from 'lucide-react';
 import { Language, WasteDataPoint, Severity } from './types';
 import { TRANSLATIONS } from './constants';
-import Dashboard from './components/Dashboard';
+//import Dashboard from './components/Dashboard';
+import Dashboard from './components/Db2';
 //import CoastalMap from './components/CoastalMap';
 import CoastalMap from './components/CM2';
 
@@ -10,7 +11,8 @@ import CoastalMap from './components/CM2';
 //Added report
 import ReportForm from './components/RF2';
 import SiteDetailsModal from './components/SiteDetailsModal';
-import Home from './components/Home';
+//import Home from './components/Home';
+import Home from './components/H2';
 import { getHistory } from './services/apiService';
 
 const App: React.FC = () => {
@@ -339,7 +341,7 @@ const App: React.FC = () => {
         {/* Dynamic Content */}
         <div className="min-h-[600px]">
           {activeTab === 'home' && <Home lang={lang} onNavigate={setActiveTab} />}
-          {activeTab === 'dashboard' && <Dashboard data={reports} lang={lang} onSiteClick={handleSiteClick} />}
+          {activeTab === 'dashboard' && <Dashboard lang={lang} />}
           {activeTab === 'map' && <CoastalMap data={reports} lang={lang} onVerify={handleVerifyReport} onDelete={handleDeleteReport} onSiteClick={handleSiteClick} />}
           {activeTab === 'report' && <ReportForm lang={lang} onReportSubmit={handleNewReport} initialData={verifyingReport} />}
         </div>
@@ -362,6 +364,6 @@ const App: React.FC = () => {
       />
     </div>
   );
-};
+};   
 
 export default App;

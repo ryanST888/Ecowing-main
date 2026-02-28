@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Camera, Upload, Loader2, AlertCircle, CheckCircle, Video, MapPin, Scan, Send, Trash, Edit2, MousePointerClick, X, Plus, Minus } from 'lucide-react';
+import { Camera, Upload, Loader2, AlertCircle, CheckCircle, Video, MapPin, Scan, Send, Trash, Edit2, MousePointerClick, X, Plus, Minus, Tag } from 'lucide-react';
 import { detectWaste } from '../services/apiService';
 import { fileToData } from '../services/geminiService';
 import { DetectionResult, Language, WasteDataPoint, GeminiAnalysisResult } from '../types';
@@ -24,6 +24,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     const [error, setError] = useState<string | null>(null);
 
     // Editable States
+    const [customReportName, setCustomReportName] = useState<string>(''); // NEW: State for custom name
     const [wasteDistribution, setWasteDistribution] = useState<Record<string, number>>({});
     const [editedSeverity, setEditedSeverity] = useState<string>("MEDIUM");
     const [showConfirm, setShowConfirm] = useState(false);
@@ -40,7 +41,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
 
     const t = TRANSLATIONS[lang];
 
-    // --- 1. Sync AI Result to Editable States ---
     useEffect(() => {
         if (result) {
             const initialDist: Record<string, number> = {};
@@ -57,17 +57,14 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         }
     }, [result]);
 
-    // --- 2. Robust Overlay Calculation (The Fix) ---
     const updateOverlay = () => {
         const container = containerRef.current;
         const media = mediaRef.current;
         if (!container || !media) return;
 
-        // Get exact dimensions
         const cW = container.clientWidth;
         const cH = container.clientHeight;
 
-        // Handle both Image and Video natural dimensions
         let mW = 0, mH = 0;
         if (media.tagName === 'IMG') {
             mW = (media as HTMLImageElement).naturalWidth;
@@ -84,15 +81,12 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
 
         let finalW, finalH, top, left;
 
-        // Calculate object-fit: contain logic manually
         if (cRatio > mRatio) {
-            // Container is wider -> Bars on sides
             finalH = cH;
             finalW = cH * mRatio;
             top = 0;
             left = (cW - finalW) / 2;
         } else {
-            // Container is taller -> Bars on top/bottom
             finalW = cW;
             finalH = cW / mRatio;
             left = 0;
@@ -102,7 +96,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         setOverlayStyle({ width: finalW, height: finalH, top, left });
     };
 
-    // Trigger calculation on Window Resize, Media Load, or State Change
     useLayoutEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -111,8 +104,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
             window.requestAnimationFrame(updateOverlay);
         });
         observer.observe(container);
-
-        // Initial calc
         updateOverlay();
 
         return () => observer.disconnect();
@@ -135,7 +126,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         }
     };
 
-    // --- File & Location Handlers ---
     const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -155,11 +145,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
             let processedFile = file;
             let objectUrl = URL.createObjectURL(file);
 
-            // Determine media type (FIXED TYPO HERE)
             const isVideo = file.type.startsWith('video');
             setSelectedMedia({ url: objectUrl, type: isVideo ? 'video' : 'image' });
 
-            // Handle HEIC if needed 
             if (file.name.toLowerCase().endsWith('.heic')) {
                 try {
                     const heic2any = await import('heic2any');
@@ -172,7 +160,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                     processedFile = new File([conversionResult], file.name.replace(/\.heic$/i, '.jpg'), {
                         type: 'image/jpeg'
                     });
-                    // Update preview for HEIC
                     objectUrl = URL.createObjectURL(conversionResult);
                     setSelectedMedia({ url: objectUrl, type: 'image' });
                 } catch (err) {
@@ -185,12 +172,13 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
             setIsAnalyzing(true);
             const lat = editLocation.lat ? parseFloat(editLocation.lat) : 22.3193;
             const lng = editLocation.lng ? parseFloat(editLocation.lng) : 114.1694;
+
             const analysis = await detectWaste(processedFile, { lat, lng }, locationName);
             setResult(analysis);
 
         } catch (err) {
             console.error(err);
-            setError("Failed to analyze media. Please check API key and format.");
+            setError("Failed to analyze media. Please check your Backend connection.");
         } finally {
             setIsAnalyzing(false);
         }
@@ -207,7 +195,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         setShowConfirm(true);
     };
 
-    const handleFinalSubmit = () => {
+    const handleFinalSubmit = async () => {
         if (!result || !selectedMedia) return;
         const finalLat = parseFloat(editLocation.lat);
         const finalLng = parseFloat(editLocation.lng);
@@ -218,8 +206,42 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
             severity: editedSeverity
         } as GeminiAnalysisResult;
 
-        onReportSubmit(updatedResult, selectedMedia, { lat: finalLat, lng: finalLng }, locationName, initialData?.id);
+        const backendImageUrl = (result as any).imageUrl;
+        const finalMediaData = {
+            type: selectedMedia.type,
+            url: backendImageUrl ? backendImageUrl : selectedMedia.url
+        };
+
+        // NEW: Check if user entered a custom name, otherwise fallback to RPT- timestamp
+        const finalReportId = customReportName.trim() !== '' ? customReportName.trim() : `RPT-${Date.now()}`;
+
+        const finalRecord = {
+            ...updatedResult,
+            id: finalReportId, // Use the custom name here
+            latitude: finalLat,
+            longitude: finalLng,
+            locationName: locationName || "Unknown",
+            verified: true,
+            imageUrl: finalMediaData.url,
+            message: updatedResult.description,
+            status: "pending",
+            timestamp: Date.now()
+        };
+
+        try {
+            await fetch('http://localhost:8000/api/reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalRecord)
+            });
+            console.log("Final edited report saved to database!");
+        } catch (e) {
+            console.error("Failed to save final report:", e);
+        }
+
+        onReportSubmit(updatedResult, finalMediaData, { lat: finalLat, lng: finalLng }, locationName, initialData?.id);
         setShowConfirm(false);
+        handleDiscard();
     };
 
     const handleDiscard = () => {
@@ -227,6 +249,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         setResult(null);
         setWasteDistribution({});
         setEditedSeverity("MEDIUM");
+        setCustomReportName(''); // Reset custom name
         setOverlayStyle(null);
         setError(null);
         setEditLocation({ lat: '', lng: '' });
@@ -234,7 +257,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         setShowConfirm(false);
     };
 
-    // --- Location Utilities ---
     const extractLocationFromFile = async (file: File): Promise<void> => {
         setLocationStatus("Reading GPS data...");
 
@@ -345,13 +367,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         return number[0].numerator + number[1].numerator / (60 * number[1].denominator) + number[2].numerator / (3600 * number[2].denominator);
     };
 
-    const handleLinkPaste = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        // (Simplified: keep your existing logic here if needed, or I can add it back full)
-        const url = e.target.value;
-        if (!url) return;
-        // ... assume logic is here or user manually types coords
-    };
-
     return (
         <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-xl overflow-hidden animate-fade-in relative">
 
@@ -371,6 +386,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                                 {lang === Language.EN ? "Are you sure the Type, Severity and Location are all correct?" : "您確定類型、嚴重程度和位置都正確嗎？"}
                             </p>
                             <div className="bg-slate-800 rounded-lg p-3 text-sm border border-slate-700">
+
+                                {/* Show the Custom Name in Confirmation */}
+                                <div className="flex justify-between mb-2 pb-2 border-b border-slate-700">
+                                    <span className="text-slate-400">{lang === Language.EN ? "Report Name:" : "報告名稱:"}</span>
+                                    <span className="text-white font-medium truncate max-w-[150px] text-right">
+                                        {customReportName.trim() ? customReportName : (lang === Language.EN ? "Auto-generated" : "自動生成")}
+                                    </span>
+                                </div>
+
                                 <div className="mb-2 pb-2 border-b border-slate-700">
                                     <span className="text-slate-400 block mb-1">{lang === Language.EN ? "Waste Composition:" : "垃圾成分:"}</span>
                                     <div className="flex flex-wrap gap-2">
@@ -500,6 +524,21 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
 
                     {result && (
                         <div className="space-y-4 animate-fade-in flex flex-col h-full">
+
+                            {/* NEW: Custom Report Name Field */}
+                            <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                                <span className="text-xs text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-2">
+                                    <Tag size={12} /> {lang === Language.EN ? "Report Name (Optional)" : "報告名稱 (可選)"}
+                                </span>
+                                <input
+                                    type="text"
+                                    value={customReportName}
+                                    onChange={(e) => setCustomReportName(e.target.value)}
+                                    placeholder={lang === Language.EN ? "e.g. Discovery Bay Cleanup" : "例如：發現灣清理區"}
+                                    className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:border-emerald-500 outline-none"
+                                />
+                            </div>
+
                             <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                                 <span className="text-xs text-slate-400 uppercase tracking-wider block mb-2">{lang === Language.EN ? "Severity Level (Select to Change)" : "嚴重程度 (點擊更改)"}</span>
                                 <div className="grid grid-cols-4 gap-2">

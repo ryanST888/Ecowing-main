@@ -1,498 +1,168 @@
-import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { WasteDataPoint, Severity, Language } from '../types';
-import { COLORS, TRANSLATIONS, WASTE_CATEGORIES } from '../constants';
-import { AlertTriangle, Trash2, Activity, MapPin } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Language } from '../types';
+import { TRANSLATIONS } from '../constants';
+import {
+  BarChart3, Trash2, AlertTriangle, Crosshair, FileClock,
+  LayoutGrid, List as ListIcon, FolderOpen, Calendar, MapPin, XCircle
+} from 'lucide-react';
+// Note: We will move the card components inside here for this example, 
+// or you can pass the delete function down as a prop if they are separate files.
 
 interface DashboardProps {
-  data: WasteDataPoint[];
   lang: Language;
-  onSiteClick?: (locationName: string) => void; // For site details
 }
 
-// For site rankings
-interface SiteData {
-  location: string;
-  totalItems: number;
-  reports: number;
-  severity: string;
-  lat?: number;
-  lng?: number;
-  lastUpdated: string;
-  allLat: number[];
-  allLng: number[];
+export interface WasteReport {
+  id: string;
+  timestamp: number;
+  latitude: number;
+  longitude: number;
+  severity: any;
+  imageUrl?: string;
+  message?: string;
+  status: 'pending' | 'verified' | 'cleaned';
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ data, lang, onSiteClick }) => {
-  const t = TRANSLATIONS[lang];
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+// --- STATIC MOCK DATA ---
+const STATIC_REPORTS: WasteReport[] = [
+  {
+    id: "RPT-2026-001",
+    timestamp: Date.now() - 3600000 * 2,
+    latitude: 22.3193,
+    longitude: 114.1694,
+    severity: 'HIGH',
+    imageUrl: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?q=80&w=600&auto=format&fit=crop",
+    message: "Large accumulation of plastic bottles trapped between rocks.",
+    status: 'pending'
+  }
+];
 
-  // Process data for charts
-  const severityCounts = data.reduce((acc, curr) => {
-    acc[curr.severity] = (acc[curr.severity] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+// --- UPDATED FOLDER ITEM (Now with a Delete Button) ---
+const FolderItem = ({ report, onDelete }: { report: WasteReport, onDelete: (id: string) => void }) => (
+  <div className="group bg-[#151e2e] border border-white/5 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl relative">
 
-  const pieData = Object.keys(severityCounts).map(key => ({
-    name: key,
-    value: severityCounts[key]
-  }));
+    {/* Delete Button (Appears on hover) */}
+    <button
+      onClick={() => onDelete(report.id)}
+      className="absolute top-2 right-2 z-20 bg-red-500/80 hover:bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md"
+      title="Delete this report"
+    >
+      <XCircle size={18} />
+    </button>
 
-  // Type Counts (Fixed Categories)
-  /*
-  const typeCounts = data.reduce((acc, curr) => {
-    // Map Unidentified/Unknown to Others
-    let type = curr.type;
-    if (!type || type === 'Unknown' || type === 'Unidentified') type = 'Others';
+    <div className="aspect-[4/3] w-full bg-slate-800 relative overflow-hidden">
+      <img src={report.imageUrl} alt="Evidence" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#151e2e] to-transparent opacity-60 pointer-events-none"></div>
+    </div>
+    <div className="p-4">
+      <h4 className="text-white font-bold text-sm mb-1">{report.id}</h4>
+      <p className="text-xs text-slate-400 truncate">{report.message}</p>
+    </div>
+  </div>
+);
 
-    // If type is not in our standard list, group into Others
-    if (!WASTE_CATEGORIES.includes(type) && type !== 'Others') {
-      type = 'Others';
-    }
-
-    // Correction to counting items
-    const itemCount = curr.boundingBoxes?.length || 1;
-    acc[type] = (acc[type] || 0) + itemCount;
-    // acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  */
-  // Type Counts - Use waste_distribution if available from Qwen
-  const typeCounts = data.reduce((acc, curr) => {
-    // 1. First try to use waste_distribution from Qwen analysis
-    if (curr.waste_distribution) {
-      Object.entries(curr.waste_distribution).forEach(([wasteType, count]) => {
-        let type = wasteType;
-        if (type === "Plastic") type = "Plastic";
-        else if (type === "Metal") type = "Metal";
-        else if (type === "Glass") type = "Glass";
-        else if (type === "Paper") type = "Paper";
-        else if (type === "Fabric") type = "Fabric";
-        else if (type === "Rubber") type = "Rubber";
-        else if (type === "Wood") type = "Wood";
-        else type = "Other";
-        acc[type] = (acc[type] || 0) + (count as number);
-      });
-    }
-    // 2. Fallback: Count bounding boxes by type from labels
-    /*
-    else if (curr.boundingBoxes?.length) {
-      // Group boxes by waste type
-      const boxTypes: Record<string, number> = {};
-
-      curr.boundingBoxes.forEach(box => {
-        const label = box.label || '';
-        let type = 'Others';
-
-        if (label.includes('Plastic')) type = 'Plastic';
-        else if (label.includes('Metal')) type = 'Metal';
-        else if (label.includes('Glass')) type = 'Glass';
-        else if (label.includes('Paper')) type = 'Paper';
-        else if (label.includes('Fabric')) type = 'Fabric';
-        else if (label.includes('Rubber')) type = 'Rubber';
-        else if (label.includes('Wood')) type = 'Wood';
-        else if (label.includes('Other')) type = 'Other';
-
-        boxTypes[type] = (boxTypes[type] || 0) + 1;
-      });
-
-      Object.entries(boxTypes).forEach(([type, count]) => {
-        acc[type] = (acc[type] || 0) + count;
-      });
-    }
-    */
-    // 3. Last resort: Use type field
-    else {
-      let type = curr.type || 'Other';
-      if (!WASTE_CATEGORIES.includes(type)) type = 'Other';
-      acc[type] = (acc[type] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  // Ensure all big categories are present, even if 0
-  /*
-  const barData = WASTE_CATEGORIES.map(cat => ({
-    name: cat,
-    count: typeCounts[cat] || 0
-  }));
-  */
-  // Then create barData from ALL types found, not just WASTE_CATEGORIES
-  const allTypes = Array.from(new Set([
-    ...WASTE_CATEGORIES,
-    ...Object.keys(typeCounts)
-  ]));
-
-  const barData = allTypes.map(cat => ({
-    name: cat,
-    count: typeCounts[cat] || 0
-  }));
-
-  // Drill-down data for selected category
-  const drillDownData = React.useMemo(() => {
-    if (!selectedCategory) return {};
-
-    return data
-      .filter(d => {
-        let type = d.type;
-        if (!type || type === 'Unknown' || type === 'Unidentified') type = 'Other';
-        if (!WASTE_CATEGORIES.includes(type) && type !== 'Other') type = 'Other';
-        return type === selectedCategory;
-      })
-      .reduce((acc, curr) => {
-        const sub = curr.subType || (lang === Language.EN ? 'Unspecified' : '未指定');
-        acc[sub] = (acc[sub] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-  }, [data, selectedCategory, lang]);
-
-  const drillDownChartData = Object.keys(drillDownData).map(key => ({
-    name: key,
-    value: drillDownData[key]
-  }));
-
-  // Site ranking by total waste items
-  const siteRankings = data.reduce((acc, curr) => {
-    // Find if this report belongs to an existing nearby site
-    const coordinatesMatchThreshold = 0.01; // ~1km difference
-
-    let matchedSiteKey = null;
-
-    for (const [existingKey, siteData] of Object.entries(acc)) {
-      // Check if location name is similar (case-insensitive partial match)
-      const nameMatch = siteData.location.toLowerCase().includes(curr.locationName?.toLowerCase() || "") ||
-        (curr.locationName?.toLowerCase() || "").includes(siteData.location.toLowerCase());
-
-      // Check if coordinates are close
-      const latDiff = Math.abs((siteData.lat || 0) - (curr.lat || 0));
-      const lngDiff = Math.abs((siteData.lng || 0) - (curr.lng || 0));
-      const coordMatch = latDiff < coordinatesMatchThreshold && lngDiff < coordinatesMatchThreshold;
-
-      if (nameMatch || coordMatch) {
-        matchedSiteKey = existingKey;
-        break;
-      }
-    }
-
-    // Create a unique site key if no match found
-    const siteKey = matchedSiteKey || `${curr.locationName || "Unknown"}-${curr.lat?.toFixed(4)}-${curr.lng?.toFixed(4)}`;
-
-    if (!acc[siteKey]) {
-      acc[siteKey] = {
-        location: curr.locationName || "Unknown Location",
-        totalItems: 0,
-        reports: 0,
-        severity: curr.severity,
-        lat: curr.lat,
-        lng: curr.lng,
-        lastUpdated: curr.timestamp,
-        // Store all coordinates for averaging later if needed
-        allLat: [curr.lat],
-        allLng: [curr.lng]
-      };
-    } else {
-      // Add coordinates to arrays for averaging
-      if (curr.lat && curr.lng) {
-        acc[siteKey].allLat.push(curr.lat);
-        acc[siteKey].allLng.push(curr.lng);
-        // Calculate average coordinates
-        acc[siteKey].lat = acc[siteKey].allLat.reduce((a, b) => a + b, 0) / acc[siteKey].allLat.length;
-        acc[siteKey].lng = acc[siteKey].allLng.reduce((a, b) => a + b, 0) / acc[siteKey].allLng.length;
-      }
-    }
-
-    // Calculate waste items for this report
-    let itemCount = 0;
-    if (curr.waste_distribution) {
-      // Sum all items from waste_distribution
-      itemCount = Object.values(curr.waste_distribution).reduce((sum: number, count) => sum + (count as number), 0);
-    } else if (curr.unique_item_count) {
-      itemCount = curr.unique_item_count;
-    } else if (curr.boundingBoxes?.length) {
-      itemCount = curr.boundingBoxes.length;
-    } else {
-      itemCount = 1; // Fallback
-    }
-
-    acc[siteKey].totalItems += itemCount;
-    acc[siteKey].reports += 1;
-
-    // Update to highest severity
-    const severityOrder: Record<string, number> = { "CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1 };
-    const currentSeverity = curr.severity as string;
-    const existingSeverity = acc[siteKey].severity as string;
-
-    if (severityOrder[currentSeverity] > severityOrder[existingSeverity]) {
-      acc[siteKey].severity = currentSeverity;
-    }
-
-    return acc;
-  }, {} as Record<string, SiteData>);
-
-  // Convert to array and sort by total items (descending)
-  const rankedSites = Object.values(siteRankings)
-    .sort((a, b) => b.totalItems - a.totalItems)
-    .slice(0, 10); // Top 10 sites
-
-  // Severity color mapping
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "CRITICAL": return "bg-red-500";
-      case "HIGH": return "bg-orange-500";
-      case "MEDIUM": return "bg-yellow-500";
-      case "LOW": return "bg-green-500";
-      default: return "bg-gray-500";
-    }
-  };
-
-  const StatsCard = ({ title, value, icon: Icon, color }: any) => (
-    <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg flex items-center space-x-4">
-      <div className={`p-4 rounded-full bg-opacity-20 ${color} bg-white`}>
-        <Icon size={24} className={color.replace('bg-', 'text-')} />
-      </div>
+// --- UPDATED LIST ITEM (Now with a Delete Button) ---
+const ListItem = ({ report, onDelete }: { report: WasteReport, onDelete: (id: string) => void }) => (
+  <div className="bg-[#151e2e] border border-white/5 rounded-xl p-4 flex items-center justify-between hover:border-emerald-500/30 transition-colors">
+    <div className="flex items-center gap-4">
+      <img src={report.imageUrl} className="w-12 h-12 rounded-lg object-cover" alt="thumb" />
       <div>
-        <p className="text-slate-400 text-sm font-medium">{title}</p>
-        <p className="text-2xl font-bold text-white">{value}</p>
+        <h4 className="text-white font-bold">{report.id}</h4>
+        <p className="text-xs text-slate-400">{new Date(report.timestamp).toLocaleString()}</p>
       </div>
     </div>
-  );
+
+    {/* Delete Button */}
+    <button
+      onClick={() => onDelete(report.id)}
+      className="text-slate-500 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors"
+      title="Delete Report"
+    >
+      <Trash2 size={18} />
+    </button>
+  </div>
+);
+
+
+const Dashboard: React.FC<DashboardProps> = ({ lang }) => {
+  const t = TRANSLATIONS[lang];
+  const [viewMode, setViewMode] = useState<'list' | 'folder'>('folder'); // Set folder as default
+
+  const [allReports, setAllReports] = useState<WasteReport[]>(STATIC_REPORTS);
+
+  // Load Data on Mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('ecoWingReports');
+    if (savedData) {
+      try {
+        const userReports = JSON.parse(savedData);
+        setAllReports([...userReports, ...STATIC_REPORTS]);
+      } catch (e) {
+        console.error("Failed to load reports", e);
+      }
+    }
+  }, []);
+
+  // --- NEW: DELETE FUNCTION ---
+  const handleDelete = (idToDelete: string) => {
+    // 1. Confirm with the user
+    if (!window.confirm("Are you sure you want to delete this report?")) return;
+
+    // 2. Remove from the screen (React State)
+    const updatedReports = allReports.filter(report => report.id !== idToDelete);
+    setAllReports(updatedReports);
+
+    // 3. Update Local Storage so it stays deleted if you refresh
+    // Note: We only save user-generated reports to local storage, not the static mock ones.
+    const userReportsOnly = updatedReports.filter(r => !STATIC_REPORTS.find(sr => sr.id === r.id));
+    localStorage.setItem('ecoWingReports', JSON.stringify(userReportsOnly));
+  };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Key Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title={t.statsTotalReports}
-          value={data.length}
-          icon={Activity}
-          color="text-emerald-400"
-        />
-        <StatsCard
-          title={t.statsCleaned}
-          value="0"
-          icon={Trash2}
-          color="text-yellow-400"
-        />
-        <StatsCard
-          title={t.statsHighRisk}
-          value={data.filter(d => d.severity === Severity.CRITICAL || d.severity === Severity.HIGH).length}
-          icon={AlertTriangle}
-          color="text-rose-500"
-        />
-        <StatsCard
-          title={lang === Language.EN ? "Active Drones" : "活躍無人機"}
-          value="0"
-          icon={MapPin}
-          color="text-cyan-400"
-        />
-      </div>
+    <div className="min-h-screen bg-[#0b1121] text-white p-6 md:p-10 pb-32 overflow-y-auto custom-scrollbar">
+      <div className="max-w-7xl mx-auto space-y-12">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Severity Distribution */}
-        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
-          <h3 className="text-lg font-semibold mb-4 text-white">{lang === Language.EN ? "Severity Distribution" : "嚴重程度分佈"}</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              {pieData.length > 0 ? (
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => {
-                      // <Cell key={`cell-${index}`} fill={[COLORS.success, COLORS.secondary, COLORS.primary, COLORS.danger][index % 4]} />
-                      // Map severity names to colors
-                      let fillColor;
-                      switch (entry.name) {
-                        case "CRITICAL":
-                          fillColor = "#ef4444"; // red-500
-                          break;
-                        case "HIGH":
-                          fillColor = "#f97316"; // orange-500
-                          break;
-                        case "MEDIUM":
-                          fillColor = "#facc15"; // yellow-500
-                          break;
-                        case "LOW":
-                          fillColor = "#10b981"; // emerald-500
-                          break;
-                        default:
-                          fillColor = COLORS.primary;
-                      }
-                      return <Cell key={`cell-${index}`} fill={fillColor} />;
-                    })}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: COLORS.card, borderColor: COLORS.dark, color: '#fff' }}
-                    itemStyle={{ color: '#fff' }}
-                  />
-                  <Legend />
-                </PieChart>
-              ) : (
-                <div className="h-full flex items-center justify-center text-slate-500 text-sm">
-                  {lang === Language.EN ? "No data available" : "暫無數據"}
-                </div>
-              )}
-            </ResponsiveContainer>
-          </div>
+        {/* Header */}
+        <div>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">{t.navDashboard}</h1>
         </div>
 
-        {/* Waste Composition */}
-        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-white">{lang === Language.EN ? "Waste Composition" : "垃圾成分分析"}</h3>
-            {selectedCategory && (
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className="text-xs text-emerald-400 hover:text-emerald-300 underline"
-              >
-                {lang === Language.EN ? "Reset View" : "重置視圖"}
+        {/* SUBMISSION HISTORY & FOLDER */}
+        <div className="pt-8 border-t border-white/5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-4">
+              <FileClock size={24} className="text-emerald-400" />
+              <h2 className="text-2xl font-bold text-white tracking-tight">Evidence Folder</h2>
+            </div>
+
+            {/* View Toggles */}
+            <div className="flex bg-[#0f172a] p-1 rounded-lg border border-white/10">
+              <button onClick={() => setViewMode('list')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'list' ? 'bg-slate-700 text-white' : 'text-slate-500'}`}>
+                <ListIcon size={16} /> List
               </button>
-            )}
+              <button onClick={() => setViewMode('folder')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'folder' ? 'bg-emerald-600 text-white' : 'text-slate-500'}`}>
+                <LayoutGrid size={16} /> Folder
+              </button>
+            </div>
           </div>
 
-          <div className="h-64 flex gap-4">
-            {/* Main Bar Chart */}
-            <div className={`transition-all duration-300 ${selectedCategory ? 'w-1/2' : 'w-full'}`}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} onClick={(data: any) => data && data.activePayload && setSelectedCategory(data.activePayload[0].payload.name)}>
-                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} interval={0} angle={-30} textAnchor="end" height={60} />
-                  <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip
-                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                    contentStyle={{ backgroundColor: COLORS.card, borderColor: COLORS.dark, color: '#fff' }}
-                  />
-                  <Bar dataKey="count" fill={COLORS.primary} radius={[4, 4, 0, 0]} cursor="pointer" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Drill Down Side Panel */}
-            {selectedCategory && (
-              <div className="w-1/2 bg-slate-900/50 rounded-lg p-4 animate-fade-in border border-slate-600 overflow-y-auto">
-                <h4 className="text-sm font-bold text-emerald-400 mb-3 border-b border-slate-600 pb-2">
-                  {selectedCategory} {lang === Language.EN ? "Details" : "詳情"}
-                </h4>
-                {drillDownChartData.length > 0 ? (
-                  <ul className="space-y-2">
-                    {drillDownChartData.map((item, idx) => (
-                      <li key={idx} className="flex justify-between text-xs text-slate-300">
-                        <span>{item.name}</span>
-                        <span className="font-mono text-white bg-slate-700 px-1.5 rounded">{item.value}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-xs text-slate-500 italic">
-                    {lang === Language.EN ? "No details available." : "無詳細資料。"}
-                  </p>
-                )}
+          <div className="animate-fade-in">
+            {viewMode === 'list' ? (
+              <div className="space-y-4">
+                {allReports.map((report, idx) => (
+                  <ListItem key={idx} report={report} onDelete={handleDelete} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {allReports.map((report, idx) => (
+                  <FolderItem key={idx} report={report} onDelete={handleDelete} />
+                ))}
               </div>
             )}
           </div>
-          <p className="text-[10px] text-slate-500 mt-2 text-center">
-            {lang === Language.EN ? "Click a bar to see details." : "點擊長條圖查看詳情。"}
-          </p>
-        </div>
-      </div>
-
-      {/* Site Ranking Card */}
-      <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">
-            {lang === Language.EN ? "Top Waste Sites" : "最多垃圾地點"}
-          </h3>
-          <span className="text-xs text-slate-400">
-            {lang === Language.EN ? "Ranked by total items" : "按垃圾數量排序"}
-          </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-700">
-                <th className="text-left py-2 px-3 text-slate-400 font-medium">
-                  {lang === Language.EN ? "Location" : "地點"}
-                </th>
-                <th className="text-right py-2 px-3 text-slate-400 font-medium">
-                  {lang === Language.EN ? "Waste Items" : "垃圾數量"}
-                </th>
-                <th className="text-right py-2 px-3 text-slate-400 font-medium">
-                  {lang === Language.EN ? "Reports" : "報告數"}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rankedSites.length > 0 ? (
-                rankedSites.map((site, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-slate-800 hover:bg-slate-700/30 transition-colors"
-                    onClick={() => onSiteClick?.(site.location)} // For site details
-                  >
-                    <td className="py-3 px-3">
-                      <div className="flex items-center">
-                        <div className={`w-3 h-3 rounded-full mr-3 ${getSeverityColor(site.severity)}`}></div>
-                        <div>
-                          <div className="font-medium text-white truncate max-w-[200px]">
-                            {site.location}
-                          </div>
-                          <div className="text-xs text-slate-500">
-                            {site.severity}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-right">
-                      <span className="font-bold text-white">{site.totalItems}</span>
-                      <div className="text-xs text-slate-500">
-                        {lang === Language.EN ? "items" : "件"}
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-right">
-                      <span className="text-slate-300">{site.reports}</span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="py-4 text-center text-slate-500">
-                    {lang === Language.EN ? "No site data available" : "暫無地點數據"}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {rankedSites.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-700">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 rounded-full bg-red-500 mr-1"></div>
-                  <span>Critical</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500 mr-1"></div>
-                  <span>Medium</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
-                  <span>Low</span>
-                </div>
-              </div>
-              <div>
-                {lang === Language.EN ? "Showing top " : "顯示前 "}{rankedSites.length}{lang === Language.EN ? " sites" : " 個地點"}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
