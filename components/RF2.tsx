@@ -229,7 +229,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         };
 
         try {
-            await fetch('http://localhost:8000/api/reports', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            await fetch(`${API_URL}/api/reports`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(finalRecord)

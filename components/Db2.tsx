@@ -198,7 +198,8 @@ const Dashboard: React.FC<DashboardProps> = ({ lang }) => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/history');
+                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+                const response = await fetch(`${API_URL}/api/history`);
 
                 if (response.ok) {
                     const backendReports = await response.json();

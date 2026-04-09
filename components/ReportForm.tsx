@@ -217,7 +217,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     // If failed, try backend expansion
     if (!coords) {
       try {
-        const res = await fetch(`http://localhost:8000/api/expand-url?url=${encodeURIComponent(url)}`);
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const res = await fetch(`${API_URL}/api/expand-url?url=${encodeURIComponent(url)}`);
         const data = await res.json();
         if (data.url) {
           coords = parseCoords(data.url);
