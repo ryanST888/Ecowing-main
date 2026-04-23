@@ -1,0 +1,470 @@
+[
+  {
+    "wasteType": [
+      "Rubber"
+    ],
+    "category": "Rubber",
+    "subCategory": "Ball",
+    "severity": "MEDIUM",
+    "description": "Detected Rubber waste (Backup Mode).",
+    "estimatedWeightKg": 3.32,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 200,
+        "xmin": 200,
+        "ymax": 350,
+        "xmax": 350,
+        "label": "Rubber (Ball)"
+      }
+    ],
+    "timestamp": 1776946189797,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": null,
+    "imageUrl": "http://localhost:8000/uploads/1776946177746.jpeg",
+    "id": "RPT-1776946189797",
+    "latitude": 22.312821,
+    "longitude": 114.187015,
+    "locationName": "Hok Yuen, Kowloon City District, Kowloon, Hong Kong, China",
+    "verified": true,
+    "message": "Detected Rubber waste (Backup Mode).",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Rubber"
+    ],
+    "category": "Rubber",
+    "subCategory": "Rubber",
+    "severity": "HIGH",
+    "description": "Detected Rubber waste (Backup Mode).",
+    "estimatedWeightKg": 1.94,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 200,
+        "xmin": 200,
+        "ymax": 350,
+        "xmax": 350,
+        "label": "Rubber (Rubber)"
+      }
+    ],
+    "timestamp": 1772075293148,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 1,
+      "Other": 0
+    },
+    "unique_item_count": null,
+    "imageUrl": "blob:http://localhost:5173/0e64b9c0-e1f5-416e-8059-1a3ca9e324be",
+    "id": "RPT-1772075293148",
+    "latitude": 22.316297,
+    "longitude": 114.180698,
+    "locationName": "Hok Yuen, Kowloon City District, Kowloon, Hong Kong, China",
+    "verified": true,
+    "message": "Detected Rubber waste (Backup Mode).",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Plate",
+    "severity": "HIGH",
+    "description": "A ceramic plate with sushi is visible, which is not considered waste but rather a dining item.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 600,
+        "xmin": 50,
+        "ymax": 1250,
+        "xmax": 950,
+        "label": "Plate"
+      }
+    ],
+    "timestamp": 1772073906225,
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 1,
+      "Glass": 1,
+      "Paper": 1,
+      "Fabric": 1,
+      "Rubber": 1,
+      "Wood": 1,
+      "Other": 0
+    },
+    "unique_item_count": 1,
+    "imageUrl": "http://localhost:8000/uploads/1772073881432.jpg",
+    "id": "RPT-1772073906225",
+    "latitude": 22.330333,
+    "longitude": 114.198417,
+    "locationName": "Kai Tak City Centre, Kowloon City District, Kowloon, Hong Kong, China",
+    "verified": true,
+    "message": "A ceramic plate with sushi is visible, which is not considered waste but rather a dining item.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Wood"
+    ],
+    "category": "Wood",
+    "subCategory": "Pallet",
+    "severity": "HIGH",
+    "description": "A wooden pallet is visible on the ground near the lotus plants, likely discarded or repurposed.",
+    "estimatedWeightKg": 5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 700,
+        "xmin": 800,
+        "ymax": 800,
+        "xmax": 900,
+        "label": "Wood"
+      }
+    ],
+    "timestamp": 1771902802941,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 3,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 3,
+      "Other": 0
+    },
+    "unique_item_count": 1,
+    "imageUrl": "http://localhost:8000/uploads/1771902775488.JPG",
+    "id": "RPT-1771902802941",
+    "latitude": 22.333982,
+    "longitude": 114.263762,
+    "locationName": "Yau Yue Wan Resite Village, Sai Kung District, New Territories, Hong Kong, China",
+    "verified": true,
+    "message": "A wooden pallet is visible on the ground near the lotus plants, likely discarded or repurposed.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General waste",
+    "severity": "HIGH",
+    "description": "A small amount of general waste is visible on the sandy ground near the base of the rock formations.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 850,
+        "xmin": 900,
+        "ymax": 900,
+        "xmax": 940,
+        "label": "Other"
+      },
+      {
+        "ymin": 870,
+        "xmin": 930,
+        "ymax": 910,
+        "xmax": 960,
+        "label": "Other"
+      },
+      {
+        "ymin": 820,
+        "xmin": 800,
+        "ymax": 850,
+        "xmax": 830,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": 1771902066817,
+    "waste_distribution": {
+      "Plastic": 1,
+      "Metal": 7,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 2
+    },
+    "unique_item_count": 3,
+    "imageUrl": "http://localhost:8000/uploads/1771902053585.JPG",
+    "id": "RPT-1771902066817",
+    "latitude": 22.333789,
+    "longitude": 114.263592,
+    "locationName": "Yau Yue Wan Resite Village, Sai Kung District, New Territories, Hong Kong, China",
+    "verified": true,
+    "message": "A small amount of general waste is visible on the sandy ground near the base of the rock formations.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "HIGH",
+    "description": "The image depicts a pristine natural landscape with no visible waste. The scene includes a reflective lake, dense forest, and snow-capped mountains under a partly cloudy sky.",
+    "estimatedWeightKg": 0,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [],
+    "timestamp": 1771902012546,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": 0,
+    "imageUrl": "http://localhost:8000/uploads/1771901992148.PNG",
+    "id": "test 1",
+    "latitude": 22.333781,
+    "longitude": 114.263574,
+    "locationName": "Yau Yue Wan Resite Village, Sai Kung District, New Territories, Hong Kong, China",
+    "verified": true,
+    "message": "The image depicts a pristine natural landscape with no visible waste. The scene includes a reflective lake, dense forest, and snow-capped mountains under a partly cloudy sky.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Rubber"
+    ],
+    "category": "Rubber",
+    "subCategory": "Shoe",
+    "severity": "MEDIUM",
+    "description": "Detected Rubber waste (Backup Mode).",
+    "estimatedWeightKg": 0.97,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 200,
+        "xmin": 200,
+        "ymax": 350,
+        "xmax": 350,
+        "label": "Rubber (Shoe)"
+      }
+    ],
+    "timestamp": 1771901747938,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 0
+    },
+    "unique_item_count": null,
+    "imageUrl": "http://localhost:8000/uploads/1771901738416.JPG",
+    "id": "RPT-1771901747938",
+    "latitude": 42.022542,
+    "longitude": 85.10665,
+    "locationName": "Luntai County, Bayingolin, Xinjiang, China",
+    "verified": true,
+    "message": "Detected Rubber waste (Backup Mode).",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "HIGH",
+    "description": "The image shows a rooftop area with some scattered debris and minor wear on the building surfaces. There are no prominent waste items visible.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 700,
+        "xmin": 200,
+        "ymax": 800,
+        "xmax": 400,
+        "label": "Other"
+      }
+    ],
+    "timestamp": 1771901478641,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 2,
+      "Paper": 0,
+      "Fabric": 2,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 3
+    },
+    "unique_item_count": 1,
+    "imageUrl": "http://localhost:8000/uploads/1771901463122.jpg",
+    "id": "RPT-1771901478641",
+    "latitude": 22.550925,
+    "longitude": 113.386536,
+    "locationName": "\u4e1c\u660e\u793e\u533a, Shiqi Subdistrict, Zhongshan, Guangdong, China",
+    "verified": true,
+    "message": "The image shows a rooftop area with some scattered debris and minor wear on the building surfaces. There are no prominent waste items visible.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Stroller",
+    "severity": "MEDIUM",
+    "description": "A baby stroller is parked on the paved area near the grass, which is not typical waste but could be considered an obstruction.",
+    "estimatedWeightKg": 5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 820,
+        "xmin": 300,
+        "ymax": 980,
+        "xmax": 400,
+        "label": "Stroller"
+      }
+    ],
+    "timestamp": 1771901372684,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 4,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 1
+    },
+    "unique_item_count": 1,
+    "imageUrl": "http://localhost:8000/uploads/1771901361205.jpg",
+    "id": "RPT-1771901372684",
+    "latitude": 22.549111,
+    "longitude": 113.387322,
+    "locationName": "\u4e1c\u660e\u793e\u533a, Shiqi Subdistrict, Zhongshan, Guangdong, China",
+    "verified": true,
+    "message": "A baby stroller is parked on the paved area near the grass, which is not typical waste but could be considered an obstruction.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "General Debris",
+    "severity": "HIGH",
+    "description": "The image shows a coastal area with some scattered debris on the ground, including small pieces of plastic and other miscellaneous waste. The overall environment appears relatively clean.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 800,
+        "xmin": 400,
+        "ymax": 850,
+        "xmax": 450,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 900,
+        "xmin": 600,
+        "ymax": 950,
+        "xmax": 650,
+        "label": "Other"
+      },
+      {
+        "ymin": 700,
+        "xmin": 300,
+        "ymax": 750,
+        "xmax": 350,
+        "label": "Plastic"
+      },
+      {
+        "ymin": 1000,
+        "xmin": 700,
+        "ymax": 1050,
+        "xmax": 750,
+        "label": "Other"
+      },
+      {
+        "ymin": 850,
+        "xmin": 500,
+        "ymax": 900,
+        "xmax": 550,
+        "label": "Plastic"
+      }
+    ],
+    "timestamp": 1771900881035,
+    "waste_distribution": {
+      "Plastic": 3,
+      "Metal": 3,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 0,
+      "Other": 2
+    },
+    "unique_item_count": 5,
+    "imageUrl": "http://localhost:8000/uploads/1771900866017.jpg",
+    "id": "RPT-1771900881035",
+    "latitude": 22.550653,
+    "longitude": 113.386597,
+    "locationName": "\u4e1c\u660e\u793e\u533a, Shiqi Subdistrict, Zhongshan, Guangdong, China",
+    "verified": true,
+    "message": "The image shows a coastal area with some scattered debris on the ground, including small pieces of plastic and other miscellaneous waste. The overall environment appears relatively clean.",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
+      "Other"
+    ],
+    "category": "Other",
+    "subCategory": "Plate",
+    "severity": "LOW",
+    "description": "A ceramic plate with a speckled design is used to serve sushi, which may not be considered waste but could be evaluated for sustainability.",
+    "estimatedWeightKg": 0.5,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 620.0,
+        "xmin": 40.0,
+        "ymax": 1250.0,
+        "xmax": 910.0,
+        "label": "Plate"
+      }
+    ],
+    "timestamp": "2026-02-24T10:23:50.751301",
+    "waste_distribution": {
+      "Other": 1
+    },
+    "unique_item_count": 1,
+    "imageUrl": "http://localhost:8000/uploads/1771899811946.jpg",
+    "id": "1771899830751",
+    "lat": 22.3193,
+    "lng": 114.1694,
+    "locationName": "Unknown",
+    "verified": true,
+    "type": "Other",
+    "message": "A ceramic plate with a speckled design is used to serve sushi, which may not be considered waste but could be evaluated for sustainability.",
+    "status": "pending"
+  }
+]
