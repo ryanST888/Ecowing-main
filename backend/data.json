@@ -1,6 +1,46 @@
 [
   {
     "wasteType": [
+      "Fabric"
+    ],
+    "category": "Fabric",
+    "subCategory": "Clothing",
+    "severity": "HIGH",
+    "description": "Detected Fabric waste (Backup Mode).",
+    "estimatedWeightKg": 0.63,
+    "cleanupPriority": "Medium",
+    "boundingBoxes": [
+      {
+        "ymin": 200,
+        "xmin": 200,
+        "ymax": 350,
+        "xmax": 350,
+        "label": "Fabric (Clothing)"
+      }
+    ],
+    "timestamp": 1776992899032,
+    "waste_distribution": {
+      "Plastic": 0,
+      "Metal": 0,
+      "Glass": 0,
+      "Paper": 0,
+      "Fabric": 0,
+      "Rubber": 0,
+      "Wood": 2,
+      "Other": 0
+    },
+    "unique_item_count": null,
+    "imageUrl": "http://localhost:8000/uploads/1776992869529.jpeg",
+    "id": "RPT-1776992899032",
+    "latitude": 22.31631,
+    "longitude": 114.180495,
+    "locationName": "Hok Yuen, Kowloon City District, Kowloon, Hong Kong, China",
+    "verified": true,
+    "message": "Detected Fabric waste (Backup Mode).",
+    "status": "pending"
+  },
+  {
+    "wasteType": [
       "Rubber"
     ],
     "category": "Rubber",

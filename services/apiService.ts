@@ -1,5 +1,8 @@
 import { DetectionResult, WasteDataPoint } from '../types';
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const apiUrl = (path: string) => `${API_BASE_URL}${path}`;
+
 export const detectWaste = async (
     file: File,
     location?: { lat: number; lng: number },
@@ -16,7 +19,7 @@ export const detectWaste = async (
         formData.append('locationName', locationName);
     }
 
-    const response = await fetch('/api/detect', {
+    const response = await fetch(apiUrl('/api/detect'), {
         method: 'POST',
         body: formData,
     });
@@ -29,7 +32,7 @@ export const detectWaste = async (
 };
 
 export const getHistory = async (): Promise<WasteDataPoint[]> => {
-    const response = await fetch('/api/history');
+    const response = await fetch(apiUrl('/api/history'));
     if (!response.ok) {
         console.error('Failed to fetch history');
         return [];

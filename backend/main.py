@@ -2,9 +2,10 @@ import json
 import random
 import time
 from typing import List, Optional, Dict
-from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from datetime import datetime
 from PIL import Image
@@ -18,21 +19,48 @@ import re
 import dashscope
 from dashscope import MultiModalConversation
 
+# Supabase
+from supabase import create_client, Client
+
 from dotenv import load_dotenv
-load_dotenv()
+import pathlib
+load_dotenv(dotenv_path=pathlib.Path(__file__).parent / ".env", override=True)
+
 app = FastAPI()
 dashscope.api_key = os.getenv("QWEN_API_KEY", "")
+
+# --- Supabase Client ---
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY) if SUPABASE_URL and SUPABASE_SERVICE_KEY else None
+
+# Security scheme for JWT auth
+security = HTTPBearer(auto_error=False)
+
+def get_allowed_origins():
+    origins = os.getenv("FRONTEND_ORIGINS", "").strip()
+    if not origins:
+        return ["*"]
+    return [origin.strip().rstrip("/") for origin in origins.split(",") if origin.strip()]
+
+def get_public_base_url(request: Request) -> str:
+    public_base_url = os.getenv("PUBLIC_BACKEND_URL", "").strip().rstrip("/")
+    if public_base_url:
+        return public_base_url
+    return str(request.base_url).rstrip("/")
 
 # Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For dev simplicity
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- CREATE AND MOUNT UPLOADS DIRECTORY ---
+# --- CREATE AND MOUNT UPLOADS DIRECTORY (kept as local fallback) ---
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
@@ -50,23 +78,139 @@ TAXONOMY: Dict[str, List[str]] = {
 }
 
 SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-DATA_FILE = "data.json"
 
-# --- Persistence ---
-def load_data():
-    if not os.path.exists(DATA_FILE):
+# --- Auth Helpers ---
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Extract user from JWT token. Returns None if no token provided."""
+    if not credentials or not supabase:
+        return None
+    try:
+        token = credentials.credentials
+        # Verify the token using Supabase
+        user_response = supabase.auth.get_user(token)
+        if user_response and user_response.user:
+            return user_response.user
+        return None
+    except Exception as e:
+        print(f"Auth error: {e}")
+        return None
+
+async def require_auth(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Require authentication. Raises 401 if not authenticated."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        token = credentials.credentials
+        user_response = supabase.auth.get_user(token)
+        if user_response and user_response.user:
+            return user_response.user
+        raise HTTPException(status_code=401, detail="Invalid token")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
+
+# --- Supabase Storage Helper ---
+def upload_image_to_supabase(file_bytes: bytes, filename: str, content_type: str, user_id: str = "anonymous") -> str:
+    """Upload an image to Supabase Storage and return the public URL."""
+    if not supabase:
+        return ""
+    try:
+        # Store under user_id folder for RLS policy matching
+        storage_path = f"{user_id}/{filename}"
+        
+        # Upload to Supabase Storage
+        supabase.storage.from_("report-images").upload(
+            path=storage_path,
+            file=file_bytes,
+            file_options={"content-type": content_type}
+        )
+        
+        # Get public URL
+        public_url = supabase.storage.from_("report-images").get_public_url(storage_path)
+        return public_url
+    except Exception as e:
+        print(f"Supabase Storage upload error: {e}")
+        return ""
+
+# --- Supabase Data Helpers ---
+def save_report_to_supabase(report_data: dict) -> bool:
+    """Save a report to Supabase reports table."""
+    if not supabase:
+        return False
+    try:
+        # Map frontend field names to database column names
+        db_record = {
+            "id": report_data.get("id", f"RPT-{int(time.time() * 1000)}"),
+            "user_id": report_data.get("user_id"),
+            "category": report_data.get("category", "Other"),
+            "sub_category": report_data.get("subCategory"),
+            "severity": report_data.get("severity", "MEDIUM"),
+            "description": report_data.get("description", ""),
+            "estimated_weight_kg": report_data.get("estimatedWeightKg", 0),
+            "cleanup_priority": report_data.get("cleanupPriority", "Medium"),
+            "waste_type": report_data.get("wasteType", []),
+            "waste_distribution": report_data.get("waste_distribution", {}),
+            "bounding_boxes": report_data.get("boundingBoxes", []),
+            "unique_item_count": report_data.get("unique_item_count"),
+            "image_url": report_data.get("imageUrl", ""),
+            "latitude": report_data.get("latitude"),
+            "longitude": report_data.get("longitude"),
+            "location_name": report_data.get("locationName", "Unknown"),
+            "verified": report_data.get("verified", True),
+            "message": report_data.get("message", ""),
+            "status": report_data.get("status", "pending"),
+        }
+        
+        # Remove None values so defaults kick in
+        db_record = {k: v for k, v in db_record.items() if v is not None}
+        
+        supabase.table("reports").insert(db_record).execute()
+        return True
+    except Exception as e:
+        print(f"Supabase save error: {e}")
+        return False
+
+def load_reports_from_supabase() -> list:
+    """Load all reports from Supabase, ordered by newest first."""
+    if not supabase:
         return []
     try:
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
-    except:
+        response = supabase.table("reports").select("*").order("created_at", desc=True).execute()
+        
+        # Map database column names back to frontend field names
+        reports = []
+        for row in response.data:
+            report = {
+                "id": row.get("id"),
+                "category": row.get("category"),
+                "subCategory": row.get("sub_category"),
+                "severity": row.get("severity"),
+                "description": row.get("description"),
+                "estimatedWeightKg": float(row.get("estimated_weight_kg", 0)),
+                "cleanupPriority": row.get("cleanup_priority"),
+                "wasteType": row.get("waste_type", []),
+                "waste_distribution": row.get("waste_distribution", {}),
+                "boundingBoxes": row.get("bounding_boxes", []),
+                "unique_item_count": row.get("unique_item_count"),
+                "imageUrl": row.get("image_url"),
+                "latitude": float(row.get("latitude", 0)) if row.get("latitude") else None,
+                "longitude": float(row.get("longitude", 0)) if row.get("longitude") else None,
+                "locationName": row.get("location_name"),
+                "verified": row.get("verified"),
+                "message": row.get("message"),
+                "status": row.get("status"),
+                "timestamp": row.get("created_at"),
+                "user_id": row.get("user_id"),
+            }
+            reports.append(report)
+        
+        return reports
+    except Exception as e:
+        print(f"Supabase load error: {e}")
         return []
-
-def save_data(new_record):
-    data = load_data()
-    data.insert(0, new_record) # Insert at the beginning so newest is top
-    with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=2)
 
 # --- Models ---
 class BoundingBox(BaseModel):
@@ -90,15 +234,127 @@ class DetectionResult(BaseModel):
     unique_item_count: Optional[int] = None
     imageUrl: Optional[str] = None
 
+class SignUpRequest(BaseModel):
+    email: str
+    password: str
+    username: Optional[str] = "User"
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+# --- Auth Endpoints ---
+@app.post("/api/auth/signup")
+async def sign_up(req: SignUpRequest):
+    """Register a new user via Supabase Auth."""
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        response = supabase.auth.sign_up({
+            "email": req.email,
+            "password": req.password,
+            "options": {
+                "data": {
+                    "username": req.username
+                }
+            }
+        })
+        
+        if response.user:
+            return {
+                "status": "success",
+                "message": "User registered successfully",
+                "user": {
+                    "id": str(response.user.id),
+                    "email": response.user.email,
+                    "username": req.username,
+                },
+                "session": {
+                    "access_token": response.session.access_token if response.session else None,
+                    "refresh_token": response.session.refresh_token if response.session else None,
+                } if response.session else None
+            }
+        else:
+            raise HTTPException(status_code=400, detail="Registration failed")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/auth/login")
+async def login(req: LoginRequest):
+    """Log in with email and password."""
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        response = supabase.auth.sign_in_with_password({
+            "email": req.email,
+            "password": req.password,
+        })
+        
+        if response.user and response.session:
+            return {
+                "status": "success",
+                "user": {
+                    "id": str(response.user.id),
+                    "email": response.user.email,
+                },
+                "session": {
+                    "access_token": response.session.access_token,
+                    "refresh_token": response.session.refresh_token,
+                    "expires_in": response.session.expires_in,
+                }
+            }
+        else:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+@app.get("/api/auth/me")
+async def get_me(user=Depends(require_auth)):
+    """Get current logged-in user info."""
+    try:
+        # Fetch profile from Supabase
+        profile_response = supabase.table("profiles").select("*").eq("id", str(user.id)).single().execute()
+        profile = profile_response.data if profile_response.data else {}
+        
+        return {
+            "id": str(user.id),
+            "email": user.email,
+            "username": profile.get("username", "User"),
+            "avatar": profile.get("avatar", "icon/default.png"),
+            "created_at": profile.get("created_at"),
+        }
+    except Exception as e:
+        return {
+            "id": str(user.id),
+            "email": user.email,
+        }
+
+@app.post("/api/auth/logout")
+async def logout():
+    """Log out (client should discard token)."""
+    return {"status": "success", "message": "Logged out"}
+
 # --- Endpoints ---
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    supabase_connected = supabase is not None
+    return {
+        "status": "ok",
+        "supabase": "connected" if supabase_connected else "not configured"
+    }
 
 @app.get("/api/history")
 def get_history():
-    """Retrieve all saved reports from local JSON store"""
-    return load_data()
+    """Retrieve all saved reports from Supabase."""
+    reports = load_reports_from_supabase()
+    if reports:
+        return reports
+    # Fallback: if Supabase returns empty, it might just be empty
+    return reports
 
 @app.get("/api/expand-url")
 def expand_url(url: str):
@@ -143,11 +399,13 @@ def compress_image_if_needed(image_bytes, max_size_mb=9.5):
 
 @app.post("/api/detect")
 async def detect_waste(
+    request: Request,
     file: UploadFile = File(...),
     lat: Optional[float] = Form(None),
     lng: Optional[float] = Form(None),
     locationName: Optional[str] = Form(None),
-    background_tasks: BackgroundTasks = BackgroundTasks()
+    background_tasks: BackgroundTasks = BackgroundTasks(),
+    user=Depends(get_current_user),
 ):
     result = None
     category_name = "Other"
@@ -168,16 +426,26 @@ async def detect_waste(
         else:
             contents = await file.read()
 
-            # --- SAVE THE FILE TO LOCAL DRIVE ---
+            # --- SAVE THE FILE ---
             file_extension = os.path.splitext(file.filename)[1] if file.filename else ".jpg"
             unique_filename = f"{int(time.time() * 1000)}{file_extension}"
-            file_path = os.path.join(UPLOAD_DIR, unique_filename)
             
-            with open(file_path, "wb") as f:
-                f.write(contents)
+            # Try uploading to Supabase Storage first
+            user_id = str(user.id) if user else "anonymous"
+            supabase_url = upload_image_to_supabase(
+                contents, unique_filename, file.content_type, user_id
+            )
             
-            final_image_url = f"http://localhost:8000/uploads/{unique_filename}"
-            print(f"File saved locally at: {file_path}")
+            if supabase_url:
+                final_image_url = supabase_url
+                print(f"File uploaded to Supabase Storage: {final_image_url}")
+            else:
+                # Fallback to local storage
+                file_path = os.path.join(UPLOAD_DIR, unique_filename)
+                with open(file_path, "wb") as f:
+                    f.write(contents)
+                final_image_url = f"{get_public_base_url(request)}/uploads/{unique_filename}"
+                print(f"File saved locally at: {file_path}")
 
             try:
                 contents = compress_image_if_needed(contents)
@@ -295,12 +563,92 @@ async def detect_waste(
             timestamp=datetime.now().isoformat()
         )
     
-    # WE REMOVED THE AUTO-SAVE HERE SO IT WAITS FOR YOUR EDITS!
     return result
 
-# --- NEW: ENDPOINT TO SAVE YOUR FINAL EDITS ---
+# --- SAVE FINAL REPORT ---
 @app.post("/api/reports")
-async def save_final_report(report_data: dict):
-    """Saves the final, user-edited report to data.json"""
-    save_data(report_data)
-    return {"status": "success"}
+async def save_final_report(report_data: dict, user=Depends(get_current_user)):
+    """Saves the final, user-edited report to Supabase."""
+    # Attach user_id if authenticated
+    if user:
+        report_data["user_id"] = str(user.id)
+    
+    success = save_report_to_supabase(report_data)
+    if success:
+        return {"status": "success", "message": "Report saved to Supabase"}
+    else:
+        return {"status": "error", "message": "Failed to save report"}
+
+# --- DELETE REPORT ---
+@app.delete("/api/reports/{report_id}")
+async def delete_report(report_id: str, user=Depends(require_auth)):
+    """Delete a report. Only the owner can delete their report."""
+    try:
+        # First check if the report belongs to the user
+        report_response = supabase.table("reports").select("user_id, image_url").eq("id", report_id).single().execute()
+        
+        if not report_response.data:
+            raise HTTPException(status_code=404, detail="Report not found")
+        
+        report_user_id = report_response.data.get("user_id")
+        if report_user_id and report_user_id != str(user.id):
+            raise HTTPException(status_code=403, detail="You can only delete your own reports")
+        
+        # Try to delete the associated image from Supabase Storage
+        image_url = report_response.data.get("image_url", "")
+        if image_url and "report-images" in image_url:
+            try:
+                # Extract the path from the URL
+                # URL format: .../storage/v1/object/public/report-images/user_id/filename
+                path_match = image_url.split("report-images/")
+                if len(path_match) > 1:
+                    storage_path = path_match[1]
+                    supabase.storage.from_("report-images").remove([storage_path])
+                    print(f"Deleted image from storage: {storage_path}")
+            except Exception as img_err:
+                print(f"Warning: Could not delete image: {img_err}")
+        
+        # Delete the report
+        supabase.table("reports").delete().eq("id", report_id).execute()
+        return {"status": "success", "message": "Report deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# --- GET SINGLE REPORT ---
+@app.get("/api/reports/{report_id}")
+async def get_report(report_id: str):
+    """Get a single report by ID."""
+    try:
+        response = supabase.table("reports").select("*").eq("id", report_id).single().execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Report not found")
+        
+        row = response.data
+        return {
+            "id": row.get("id"),
+            "category": row.get("category"),
+            "subCategory": row.get("sub_category"),
+            "severity": row.get("severity"),
+            "description": row.get("description"),
+            "estimatedWeightKg": float(row.get("estimated_weight_kg", 0)),
+            "cleanupPriority": row.get("cleanup_priority"),
+            "wasteType": row.get("waste_type", []),
+            "waste_distribution": row.get("waste_distribution", {}),
+            "boundingBoxes": row.get("bounding_boxes", []),
+            "unique_item_count": row.get("unique_item_count"),
+            "imageUrl": row.get("image_url"),
+            "latitude": float(row.get("latitude", 0)) if row.get("latitude") else None,
+            "longitude": float(row.get("longitude", 0)) if row.get("longitude") else None,
+            "locationName": row.get("location_name"),
+            "verified": row.get("verified"),
+            "message": row.get("message"),
+            "status": row.get("status"),
+            "timestamp": row.get("created_at"),
+            "user_id": row.get("user_id"),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
