@@ -229,7 +229,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         };
 
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
             await fetch(`${API_URL}/api/reports`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

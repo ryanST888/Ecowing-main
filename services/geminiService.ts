@@ -116,7 +116,7 @@ export const analyzeWasteMedia = async (fileData: FileData, language: string): P
     formData.append('language', language);
 
     // Call your backend
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
     const response = await fetch(`${API_URL}/api/detect`, {
       method: 'POST',
       body: formData
