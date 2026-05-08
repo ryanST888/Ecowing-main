@@ -52,9 +52,16 @@ def get_public_base_url(request: Request) -> str:
     return str(request.base_url).rstrip("/")
 
 # Allow CORS for frontend
+# 刪除 get_allowed_origins 函數，直接使用寫死的陣列
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_allowed_origins(),
+    allow_origins=[
+        "http://localhost:5173",
+        "http://ecowing.hk",
+        "https://ecowing.hk",
+        "https://www.ecowing.hk",
+        "https://ecowing-main.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
