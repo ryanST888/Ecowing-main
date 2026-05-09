@@ -3,12 +3,14 @@ import { Language } from '../types';
 import { TRANSLATIONS } from '../constants';
 import {
     BarChart3, Trash2, AlertTriangle, Crosshair, FileClock,
-    LayoutGrid, List as ListIcon, FolderOpen, Calendar, MapPin
+    LayoutGrid, List as ListIcon, FolderOpen, Calendar, Loader2
 } from 'lucide-react';
 import ReportHistoryCard from './ReportHistoryCard';
+import { deleteReport } from '../services/apiService';
 
 interface DashboardProps {
     lang: Language;
+    onDeleteReport?: (id: string) => Promise<void> | void;
 }
 
 export interface WasteReport {
@@ -133,7 +135,17 @@ const AppleBarChart = ({ reports, lang }: { reports: any[], lang: Language }) =>
     );
 };
 
-const FolderItem = ({ report, lang }: { report: WasteReport, lang: Language }) => {
+const FolderItem = ({
+    report,
+    lang,
+    onDelete,
+    isDeleting
+}: {
+    report: WasteReport,
+    lang: Language,
+    onDelete?: (id: string) => void,
+    isDeleting?: boolean
+}) => {
     const safeDate = report.timestamp ? new Date(report.timestamp).toLocaleDateString() : "Unknown Date";
 
     const activeCategories = report.waste_distribution
@@ -159,7 +171,22 @@ const FolderItem = ({ report, lang }: { report: WasteReport, lang: Language }) =
         : [defaultCat];
 
     return (
-        <div className="group bg-[#151e2e] border border-white/5 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer">
+        <div className="group bg-[#151e2e] border border-white/5 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer relative">
+            {onDelete && (
+                <button
+                    type="button"
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onDelete(report.id);
+                    }}
+                    disabled={isDeleting}
+                    className="absolute top-3 right-3 z-20 h-9 w-9 inline-flex items-center justify-center rounded-lg border border-red-400/40 bg-slate-950/85 text-red-300 shadow-lg backdrop-blur transition-all hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-60 md:opacity-0 md:group-hover:opacity-100"
+                    title={lang === Language.EN ? 'Delete report' : '刪除報告'}
+                    aria-label={lang === Language.EN ? `Delete ${report.id}` : `刪除 ${report.id}`}
+                >
+                    {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                </button>
+            )}
             <div className="aspect-[4/3] w-full bg-slate-800 relative overflow-hidden">
                 <img src={report.imageUrl || "https://via.placeholder.com/400"} alt="Evidence" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#151e2e] to-transparent opacity-60"></div>
@@ -190,10 +217,11 @@ const FolderItem = ({ report, lang }: { report: WasteReport, lang: Language }) =
     );
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ lang }) => {
+const Dashboard: React.FC<DashboardProps> = ({ lang, onDeleteReport }) => {
     const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN] || { navDashboard: "Dashboard" };
     const [viewMode, setViewMode] = useState<'list' | 'folder'>('list');
     const [allReports, setAllReports] = useState<WasteReport[]>(STATIC_REPORTS);
+    const [deletingReportId, setDeletingReportId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchReports = async () => {
@@ -233,6 +261,39 @@ const Dashboard: React.FC<DashboardProps> = ({ lang }) => {
 
         fetchReports();
     }, []);
+
+    const handleDeleteReport = async (reportId: string) => {
+        if (!reportId || deletingReportId) return;
+
+        const confirmed = window.confirm(
+            lang === Language.EN
+                ? `Delete ${reportId}? This cannot be undone.`
+                : `刪除 ${reportId}？此操作無法復原。`
+        );
+
+        if (!confirmed) return;
+
+        setDeletingReportId(reportId);
+
+        try {
+            if (onDeleteReport) {
+                await onDeleteReport(reportId);
+            } else {
+                await deleteReport(reportId);
+            }
+
+            setAllReports(prev => prev.filter(report => report.id !== reportId));
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            window.alert(
+                lang === Language.EN
+                    ? `Could not delete this report: ${message}`
+                    : `無法刪除此報告：${message}`
+            );
+        } finally {
+            setDeletingReportId(null);
+        }
+    };
 
     if (!t) return <div className="min-h-screen bg-[#0b1121] flex items-center justify-center text-white">Loading Dashboard...</div>;
 
@@ -339,16 +400,32 @@ const Dashboard: React.FC<DashboardProps> = ({ lang }) => {
                     </div>
 
                     <div className="animate-fade-in">
-                        {viewMode === 'list' ? (
+                        {allReports.length === 0 ? (
+                            <div className="rounded-2xl border border-dashed border-slate-700 bg-[#151e2e]/60 p-8 text-center text-slate-400">
+                                {lang === Language.EN ? 'No reports found.' : '未找到報告。'}
+                            </div>
+                        ) : viewMode === 'list' ? (
                             <div className="space-y-4">
                                 {allReports.map((report, idx) => (
-                                    <ReportHistoryCard key={`${report.id}-${idx}`} report={report} lang={lang} />
+                                    <ReportHistoryCard
+                                        key={`${report.id}-${idx}`}
+                                        report={report}
+                                        lang={lang}
+                                        onDelete={handleDeleteReport}
+                                        isDeleting={deletingReportId === report.id}
+                                    />
                                 ))}
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {allReports.map((report, idx) => (
-                                    <FolderItem key={`${report.id}-${idx}`} report={report} lang={lang} />
+                                    <FolderItem
+                                        key={`${report.id}-${idx}`}
+                                        report={report}
+                                        lang={lang}
+                                        onDelete={handleDeleteReport}
+                                        isDeleting={deletingReportId === report.id}
+                                    />
                                 ))}
                             </div>
                         )}

@@ -588,21 +588,29 @@ async def save_final_report(report_data: dict, user=Depends(get_current_user)):
 
 # --- DELETE REPORT ---
 @app.delete("/api/reports/{report_id}")
-async def delete_report(report_id: str, user=Depends(require_auth)):
-    """Delete a report. Only the owner can delete their report."""
+async def delete_report(report_id: str, user=Depends(get_current_user)):
+    """Delete a report. Owner auth is required only for user-owned reports."""
     try:
-        # First check if the report belongs to the user
-        report_response = supabase.table("reports").select("user_id, image_url").eq("id", report_id).single().execute()
+        if not supabase:
+            raise HTTPException(status_code=500, detail="Supabase not configured")
+
+        # First check if the report belongs to a user.
+        report_response = supabase.table("reports").select("user_id, image_url").eq("id", report_id).limit(1).execute()
         
         if not report_response.data:
             raise HTTPException(status_code=404, detail="Report not found")
+
+        report = report_response.data[0]
         
-        report_user_id = report_response.data.get("user_id")
-        if report_user_id and report_user_id != str(user.id):
-            raise HTTPException(status_code=403, detail="You can only delete your own reports")
+        report_user_id = report.get("user_id")
+        if report_user_id:
+            if not user:
+                raise HTTPException(status_code=401, detail="Authentication required")
+            if report_user_id != str(user.id):
+                raise HTTPException(status_code=403, detail="You can only delete your own reports")
         
         # Try to delete the associated image from Supabase Storage
-        image_url = report_response.data.get("image_url", "")
+        image_url = report.get("image_url", "")
         if image_url and "report-images" in image_url:
             try:
                 # Extract the path from the URL

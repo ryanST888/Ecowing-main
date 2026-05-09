@@ -13,7 +13,7 @@ import ReportForm from './components/RF2';
 import SiteDetailsModal from './components/SiteDetailsModal';
 //import Home from './components/Home';
 import Home from './components/H2';
-import { getHistory } from './services/apiService';
+import { deleteReport, getHistory } from './services/apiService';
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>(Language.EN);
@@ -136,12 +136,22 @@ const App: React.FC = () => {
     setActiveTab('report');
   };
 
-  const handleDeleteReport = (id: string) => {
+  const removeReport = async (id: string) => {
+    await deleteReport(id);
+    setReports(prev => prev.filter(r => r.id !== id));
+    // Also clear verify state if we deleted the one being edited
+    if (verifyingReport?.id === id) {
+      setVerifyingReport(null);
+    }
+  };
+
+  const handleDeleteReport = async (id: string) => {
     if (confirm(lang === Language.EN ? "Are you sure you want to delete this report?" : "確定要刪除此報告嗎？")) {
-      setReports(prev => prev.filter(r => r.id !== id));
-      // Also clear verify state if we deleted the one being edited
-      if (verifyingReport?.id === id) {
-        setVerifyingReport(null);
+      try {
+        await removeReport(id);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        alert(lang === Language.EN ? `Could not delete this report: ${message}` : `無法刪除此報告：${message}`);
       }
     }
   };
@@ -342,7 +352,7 @@ const App: React.FC = () => {
         {/* Dynamic Content */}
         <div className="min-h-[600px]">
           {activeTab === 'home' && <Home lang={lang} onNavigate={setActiveTab} />}
-          {activeTab === 'dashboard' && <Dashboard lang={lang} />}
+          {activeTab === 'dashboard' && <Dashboard lang={lang} onDeleteReport={removeReport} />}
           {activeTab === 'map' && <CoastalMap data={reports} lang={lang} onVerify={handleVerifyReport} onDelete={handleDeleteReport} onSiteClick={handleSiteClick} />}
           {activeTab === 'report' && <ReportForm lang={lang} onReportSubmit={handleNewReport} initialData={verifyingReport} />}
         </div>

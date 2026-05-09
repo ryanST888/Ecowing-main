@@ -39,3 +39,22 @@ export const getHistory = async (): Promise<WasteDataPoint[]> => {
     }
     return response.json();
 };
+
+export const deleteReport = async (id: string): Promise<void> => {
+    const response = await fetch(apiUrl(`/api/reports/${encodeURIComponent(id)}`), {
+        method: 'DELETE',
+    });
+
+    if (!response.ok) {
+        let message = `Failed to delete report (${response.status})`;
+
+        try {
+            const error = await response.json();
+            message = error.detail || error.message || message;
+        } catch {
+            // Keep the default message if the backend did not return JSON.
+        }
+
+        throw new Error(message);
+    }
+};

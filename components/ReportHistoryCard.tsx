@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, ChevronDown, ChevronUp, Tag, Image as ImageIcon, MessageSquare } from 'lucide-react';
+import { Calendar, MapPin, ChevronDown, ChevronUp, Tag, Image as ImageIcon, MessageSquare, Trash2, Loader2 } from 'lucide-react';
 import { Language } from '../types';
 
 interface CardProps {
@@ -15,10 +15,12 @@ interface CardProps {
         category?: string; 
         waste_distribution?: Record<string, number>; 
     };
-    lang: Language; // 🚨 Receive language state here
+    lang: Language;
+    onDelete?: (id: string) => void;
+    isDeleting?: boolean;
 }
 
-const ReportHistoryCard = ({ report, lang }: CardProps) => {
+const ReportHistoryCard = ({ report, lang, onDelete, isDeleting = false }: CardProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const getSeverityColor = (sev: string) => {
@@ -85,7 +87,22 @@ const ReportHistoryCard = ({ report, lang }: CardProps) => {
                         </div>
                     </div>
                 </div>
-                <div className="text-slate-500 pr-2 shrink-0">
+                <div className="text-slate-500 pr-2 shrink-0 flex items-center gap-2">
+                    {onDelete && (
+                        <button
+                            type="button"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onDelete(report.id);
+                            }}
+                            disabled={isDeleting}
+                            className="h-9 w-9 inline-flex items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 transition-colors hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                            title={lang === Language.EN ? 'Delete report' : '刪除報告'}
+                            aria-label={lang === Language.EN ? `Delete ${report.id}` : `刪除 ${report.id}`}
+                        >
+                            {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                        </button>
+                    )}
                     {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </div>
             </div>
