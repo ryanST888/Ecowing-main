@@ -3,18 +3,21 @@ import { Language } from '../types';
 import { TRANSLATIONS } from '../constants';
 import {
     BarChart3, Trash2, AlertTriangle, Crosshair, FileClock,
-    LayoutGrid, List as ListIcon, FolderOpen, Calendar, Loader2
+    LayoutGrid, List as ListIcon, FolderOpen, Calendar, Loader2, User
 } from 'lucide-react';
 import ReportHistoryCard from './ReportHistoryCard';
 import { deleteReport } from '../services/apiService';
 
 interface DashboardProps {
     lang: Language;
+    currentUserId?: string;
     onDeleteReport?: (id: string) => Promise<void> | void;
 }
 
 export interface WasteReport {
     id: string;
+    user_id?: string | null;
+    username?: string;
     timestamp: number;
     latitude: number;
     longitude: number;
@@ -211,13 +214,14 @@ const FolderItem = ({
                 <h4 className="text-white font-bold text-sm mb-1 line-clamp-1">{report.id || "Unknown ID"}</h4>
                 <div className="flex items-center gap-4 text-slate-500 text-xs mt-2">
                     <span className="flex items-center gap-1"><Calendar size={12} /> {safeDate}</span>
+                    <span className="flex items-center gap-1"><User size={12} /> {report.username || 'Anonymous'}</span>
                 </div>
             </div>
         </div>
     );
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ lang, onDeleteReport }) => {
+const Dashboard: React.FC<DashboardProps> = ({ lang, currentUserId, onDeleteReport }) => {
     const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN] || { navDashboard: "Dashboard" };
     const [viewMode, setViewMode] = useState<'list' | 'folder'>('list');
     const [allReports, setAllReports] = useState<WasteReport[]>(STATIC_REPORTS);
@@ -243,6 +247,8 @@ const Dashboard: React.FC<DashboardProps> = ({ lang, onDeleteReport }) => {
                             message: item.message || item.description || 'No description provided.',
                             imageUrl: item.imageUrl || 'https://via.placeholder.com/400',
                             id: item.id || `RPT-${Math.floor(Math.random() * 10000)}`,
+                            user_id: item.user_id || null,
+                            username: item.username || 'Anonymous',
                             status: item.status || 'pending',
                             timestamp: item.timestamp || Date.now()
                         }));
@@ -406,27 +412,33 @@ const Dashboard: React.FC<DashboardProps> = ({ lang, onDeleteReport }) => {
                             </div>
                         ) : viewMode === 'list' ? (
                             <div className="space-y-4">
-                                {allReports.map((report, idx) => (
-                                    <ReportHistoryCard
-                                        key={`${report.id}-${idx}`}
-                                        report={report}
-                                        lang={lang}
-                                        onDelete={handleDeleteReport}
-                                        isDeleting={deletingReportId === report.id}
-                                    />
-                                ))}
+                                {allReports.map((report, idx) => {
+                                    const canDelete = Boolean(currentUserId) && (!report.user_id || report.user_id === currentUserId);
+                                    return (
+                                        <ReportHistoryCard
+                                            key={`${report.id}-${idx}`}
+                                            report={report}
+                                            lang={lang}
+                                            onDelete={canDelete ? handleDeleteReport : undefined}
+                                            isDeleting={deletingReportId === report.id}
+                                        />
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {allReports.map((report, idx) => (
-                                    <FolderItem
-                                        key={`${report.id}-${idx}`}
-                                        report={report}
-                                        lang={lang}
-                                        onDelete={handleDeleteReport}
-                                        isDeleting={deletingReportId === report.id}
-                                    />
-                                ))}
+                                {allReports.map((report, idx) => {
+                                    const canDelete = Boolean(currentUserId) && (!report.user_id || report.user_id === currentUserId);
+                                    return (
+                                        <FolderItem
+                                            key={`${report.id}-${idx}`}
+                                            report={report}
+                                            lang={lang}
+                                            onDelete={canDelete ? handleDeleteReport : undefined}
+                                            isDeleting={deletingReportId === report.id}
+                                        />
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

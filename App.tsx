@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Map as MapIcon, Upload, Menu, X, Home as HomeIcon } from 'lucide-react';
-import { Language, WasteDataPoint, Severity } from './types';
+import { LayoutDashboard, Map as MapIcon, Upload, Menu, X, Home as HomeIcon, Mail, Lock, User, Loader2 } from 'lucide-react';
+import { AuthUser, Language, WasteDataPoint, Severity } from './types';
 import { TRANSLATIONS } from './constants';
 //import Dashboard from './components/Dashboard';
 import Dashboard from './components/Db2';
@@ -13,7 +13,7 @@ import ReportForm from './components/RF2';
 import SiteDetailsModal from './components/SiteDetailsModal';
 //import Home from './components/Home';
 import Home from './components/H2';
-import { deleteReport, getHistory } from './services/apiService';
+import { clearStoredAuth, deleteReport, getCurrentUser, getHistory, getStoredAuth, login, setStoredAuth, signUp } from './services/apiService';
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>(Language.EN);
@@ -36,9 +36,16 @@ const App: React.FC = () => {
   });
 
   // [Added] Login state
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [authMessage, setAuthMessage] = useState('');
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authUsername, setAuthUsername] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const isLoggedIn = Boolean(authUser);
 
   // Load reports from Backend on mount
   useEffect(() => {
@@ -53,6 +60,22 @@ const App: React.FC = () => {
     loadReports();
   }, []);
 
+  useEffect(() => {
+    const storedAuth = getStoredAuth();
+    if (!storedAuth) return;
+
+    setAuthUser(storedAuth.user);
+    getCurrentUser()
+      .then(user => {
+        setAuthUser(user);
+        setStoredAuth({ user, session: storedAuth.session });
+      })
+      .catch(() => {
+        clearStoredAuth();
+        setAuthUser(null);
+      });
+  }, []);
+
   const [verifyingReport, setVerifyingReport] = useState<WasteDataPoint | null>(null);
   const isHomePage = activeTab === 'home';
 
@@ -61,6 +84,8 @@ const App: React.FC = () => {
   const handleNewReport = (analysis: any, mediaData: { type: 'image' | 'video', url: string }, location: { lat: number, lng: number }, locationName: string, id?: string) => {
     const newReport: WasteDataPoint = {
       id: id || Date.now().toString(),
+      user_id: authUser?.id || null,
+      username: authUser?.username || 'Anonymous',
       lat: location.lat,
       lng: location.lng,
       type: analysis.wasteType[0] || 'Unknown',
@@ -78,7 +103,7 @@ const App: React.FC = () => {
 
     setReports(prev => {
       // If ID exists, replace. Else prepend.
-      if (id) {
+      if (id && prev.some(r => r.id === id)) {
         return prev.map(r => r.id === id ? newReport : r);
       }
       return [newReport, ...prev];
@@ -156,21 +181,50 @@ const App: React.FC = () => {
     }
   };
 
-  // [Added] For Subscribed User Login
-  const handleLogin = (username: string, password: string) => {
-    if (username === 'ecowing' && password === '123456') {
-      setIsLoggedIn(true);
+  const handleAuthSubmit = async () => {
+    setLoginError('');
+    setAuthMessage('');
+
+    if (!authEmail.trim() || !authPassword.trim()) {
+      setLoginError(lang === Language.EN ? 'Email and password are required.' : '請輸入電郵和密碼。');
+      return;
+    }
+
+    if (authMode === 'signup' && !authUsername.trim()) {
+      setLoginError(lang === Language.EN ? 'Username is required.' : '請輸入用戶名稱。');
+      return;
+    }
+
+    setAuthLoading(true);
+    try {
+      if (authMode === 'signup') {
+        const auth = await signUp(authEmail.trim(), authPassword, authUsername.trim());
+        if (!auth) {
+          setAuthMessage(lang === Language.EN ? 'Account created. Please check your email to confirm before logging in.' : '帳戶已建立，請先到電郵確認後再登入。');
+          setAuthMode('login');
+          return;
+        }
+        setAuthUser(auth.user);
+      } else {
+        const auth = await login(authEmail.trim(), authPassword);
+        setAuthUser(auth.user);
+      }
+
       setShowLogin(false);
       setLoginError('');
-      alert(lang === Language.EN ? 'Login successful!' : '登入成功！');
-    } else {
-      setLoginError(lang === Language.EN ? 'Invalid credentials' : '無效的登入資料');
+      setAuthMessage('');
+      setAuthPassword('');
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : (lang === Language.EN ? 'Authentication failed.' : '登入失敗。'));
+    } finally {
+      setAuthLoading(false);
     }
   };
 
   // [Added] For Subscribed User Logout
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    clearStoredAuth();
+    setAuthUser(null);
     setActiveTab('home');
     alert(lang === Language.EN ? 'Logged out' : '已登出');
   };
@@ -179,7 +233,10 @@ const App: React.FC = () => {
     <button
       onClick={() => {
         // [Added] Login Check
-        if (tab === 'dashboard' && !isLoggedIn) {
+        if ((tab === 'dashboard' || tab === 'report') && !isLoggedIn) {
+          setAuthMode('login');
+          setLoginError('');
+          setAuthMessage(lang === Language.EN ? 'Please log in or create an account to continue.' : '請先登入或建立帳戶再繼續。');
           setShowLogin(true);
           return;
         }
@@ -203,41 +260,94 @@ const App: React.FC = () => {
     <div className="fixed inset-0 bg-black/70 z-[1000] flex items-center justify-center p-4">
       <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-2xl max-w-sm w-full p-6">
         <h2 className="text-xl font-bold text-white mb-2">
-          {lang === Language.EN ? 'Login Required' : '需要登入'}
+          {authMode === 'login'
+            ? (lang === Language.EN ? 'Log in' : '登入')
+            : (lang === Language.EN ? 'Create account' : '建立帳戶')}
         </h2>
         <p className="text-slate-400 text-sm mb-6">
           {lang === Language.EN
-            ? 'Please login to access the dashboard'
-            : '請登入以查看儀表板'}
+            ? 'Use your email account to upload and manage reports.'
+            : '使用電郵帳戶上傳和管理報告。'}
         </p>
 
+        <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-900/60 p-1 border border-slate-700 mb-5">
+          <button
+            onClick={() => {
+              setAuthMode('login');
+              setLoginError('');
+            }}
+            className={`py-2 rounded-md text-sm font-bold transition-colors ${authMode === 'login' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
+          >
+            {lang === Language.EN ? 'Login' : '登入'}
+          </button>
+          <button
+            onClick={() => {
+              setAuthMode('signup');
+              setLoginError('');
+            }}
+            className={`py-2 rounded-md text-sm font-bold transition-colors ${authMode === 'signup' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
+          >
+            {lang === Language.EN ? 'Sign up' : '註冊'}
+          </button>
+        </div>
+
         <div className="space-y-4">
+          {authMode === 'signup' && (
+            <div>
+              <label className="block text-sm text-slate-400 mb-1">
+                {lang === Language.EN ? 'Username' : '用戶名稱'}
+              </label>
+              <div className="relative">
+                <User size={16} className="absolute left-3 top-3 text-slate-500" />
+                <input
+                  type="text"
+                  value={authUsername}
+                  onChange={(e) => setAuthUsername(e.target.value)}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-9 py-2 text-white focus:border-emerald-500 outline-none"
+                />
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm text-slate-400 mb-1">
-              {lang === Language.EN ? 'Username' : '用戶名'}
+              {lang === Language.EN ? 'Email' : '電郵'}
             </label>
-            <input
-              type="text"
-              id="username"
-              defaultValue="ecowing"
-              className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:border-emerald-500 outline-none"
-            />
+            <div className="relative">
+              <Mail size={16} className="absolute left-3 top-3 text-slate-500" />
+              <input
+                type="email"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-600 rounded px-9 py-2 text-white focus:border-emerald-500 outline-none"
+              />
+            </div>
           </div>
 
           <div>
             <label className="block text-sm text-slate-400 mb-1">
               {lang === Language.EN ? 'Password' : '密碼'}
             </label>
-            <input
-              type="password"
-              id="password"
-              defaultValue="123456"
-              className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:border-emerald-500 outline-none"
-            />
+            <div className="relative">
+              <Lock size={16} className="absolute left-3 top-3 text-slate-500" />
+              <input
+                type="password"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAuthSubmit();
+                }}
+                className="w-full bg-slate-700 border border-slate-600 rounded px-9 py-2 text-white focus:border-emerald-500 outline-none"
+              />
+            </div>
           </div>
 
+          {authMessage && (
+            <div className="text-emerald-300 text-sm bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">{authMessage}</div>
+          )}
+
           {loginError && (
-            <div className="text-red-400 text-sm">{loginError}</div>
+            <div className="text-red-300 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3">{loginError}</div>
           )}
 
           <div className="flex gap-3 pt-2">
@@ -248,14 +358,14 @@ const App: React.FC = () => {
               {lang === Language.EN ? 'Cancel' : '取消'}
             </button>
             <button
-              onClick={() => {
-                const username = (document.getElementById('username') as HTMLInputElement).value;
-                const password = (document.getElementById('password') as HTMLInputElement).value;
-                handleLogin(username, password);
-              }}
-              className="flex-1 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors font-bold"
+              onClick={handleAuthSubmit}
+              disabled={authLoading}
+              className="flex-1 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors font-bold flex items-center justify-center gap-2 disabled:opacity-70"
             >
-              {lang === Language.EN ? 'Login' : '登入'}
+              {authLoading && <Loader2 size={16} className="animate-spin" />}
+              {authMode === 'login'
+                ? (lang === Language.EN ? 'Login' : '登入')
+                : (lang === Language.EN ? 'Sign up' : '註冊')}
             </button>
           </div>
 
@@ -285,6 +395,11 @@ const App: React.FC = () => {
                 <span className="text-yellow-400">W</span>
                 <span className="text-emerald-500">ing</span>
               </span>
+              {authUser && (
+                <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">
+                  {authUser.username}
+                </span>
+              )}
               {/* ADD LOGIN STATUS BADGE */}
               {/* {isLoggedIn && (
                 <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">
@@ -301,6 +416,18 @@ const App: React.FC = () => {
               <NavItem tab="report" icon={Upload} label={t.navReport} />
 
               <div className="h-6 w-px bg-slate-700 mx-2"></div>
+
+              {!isLoggedIn && (
+                <button
+                  onClick={() => {
+                    setAuthMode('login');
+                    setShowLogin(true);
+                  }}
+                  className="text-xs font-semibold px-3 py-1 bg-emerald-900/30 border border-emerald-700/50 text-emerald-300 rounded hover:bg-emerald-800/30 transition-colors"
+                >
+                  {lang === Language.EN ? 'Login' : '登入'}
+                </button>
+              )}
 
               {/* LOGOUT BUTTON - show when logged in */}
               {isLoggedIn && (
@@ -336,6 +463,25 @@ const App: React.FC = () => {
             <NavItem tab="dashboard" icon={LayoutDashboard} label={t.navDashboard} />
             <NavItem tab="map" icon={MapIcon} label={t.navMap} />
             <NavItem tab="report" icon={Upload} label={t.navReport} />
+            {!isLoggedIn ? (
+              <button
+                onClick={() => {
+                  setAuthMode('login');
+                  setShowLogin(true);
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-emerald-300 hover:text-white"
+              >
+                {lang === Language.EN ? 'Login' : '登入'}
+              </button>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-red-300 hover:text-white"
+              >
+                {lang === Language.EN ? 'Logout' : '登出'}
+              </button>
+            )}
             <button
               onClick={() => setLang(l => l === Language.EN ? Language.ZH : Language.EN)}
               className="w-full text-left px-4 py-2 text-slate-400 hover:text-white"
@@ -352,7 +498,7 @@ const App: React.FC = () => {
         {/* Dynamic Content */}
         <div className="min-h-[600px]">
           {activeTab === 'home' && <Home lang={lang} onNavigate={setActiveTab} />}
-          {activeTab === 'dashboard' && <Dashboard lang={lang} onDeleteReport={removeReport} />}
+          {activeTab === 'dashboard' && <Dashboard lang={lang} currentUserId={authUser?.id} onDeleteReport={removeReport} />}
           {activeTab === 'map' && <CoastalMap data={reports} lang={lang} onVerify={handleVerifyReport} onDelete={handleDeleteReport} onSiteClick={handleSiteClick} />}
           {activeTab === 'report' && <ReportForm lang={lang} onReportSubmit={handleNewReport} initialData={verifyingReport} />}
         </div>

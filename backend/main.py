@@ -186,10 +186,27 @@ def load_reports_from_supabase() -> list:
         return []
     try:
         response = supabase.table("reports").select("*").order("created_at", desc=True).execute()
+        user_ids = [
+            str(row.get("user_id"))
+            for row in response.data
+            if row.get("user_id")
+        ]
+        profile_map = {}
+
+        if user_ids:
+            try:
+                profile_response = supabase.table("profiles").select("id, username").in_("id", user_ids).execute()
+                profile_map = {
+                    str(profile.get("id")): profile.get("username", "User")
+                    for profile in profile_response.data
+                }
+            except Exception as profile_err:
+                print(f"Supabase profile load warning: {profile_err}")
         
         # Map database column names back to frontend field names
         reports = []
         for row in response.data:
+            user_id = row.get("user_id")
             report = {
                 "id": row.get("id"),
                 "category": row.get("category"),
@@ -210,7 +227,8 @@ def load_reports_from_supabase() -> list:
                 "message": row.get("message"),
                 "status": row.get("status"),
                 "timestamp": row.get("created_at"),
-                "user_id": row.get("user_id"),
+                "user_id": user_id,
+                "username": profile_map.get(str(user_id), "Anonymous") if user_id else "Anonymous",
             }
             reports.append(report)
         
@@ -268,6 +286,14 @@ async def sign_up(req: SignUpRequest):
         })
         
         if response.user:
+            try:
+                supabase.table("profiles").upsert({
+                    "id": str(response.user.id),
+                    "username": req.username or "User",
+                }).execute()
+            except Exception as profile_err:
+                print(f"Supabase profile save warning: {profile_err}")
+
             return {
                 "status": "success",
                 "message": "User registered successfully",
@@ -300,11 +326,23 @@ async def login(req: LoginRequest):
         })
         
         if response.user and response.session:
+            username = "User"
+            try:
+                profile_response = supabase.table("profiles").select("username").eq("id", str(response.user.id)).limit(1).execute()
+                if profile_response.data:
+                    username = profile_response.data[0].get("username") or username
+                else:
+                    metadata = getattr(response.user, "user_metadata", {}) or {}
+                    username = metadata.get("username") or username
+            except Exception as profile_err:
+                print(f"Supabase profile login warning: {profile_err}")
+
             return {
                 "status": "success",
                 "user": {
                     "id": str(response.user.id),
                     "email": response.user.email,
+                    "username": username,
                 },
                 "session": {
                     "access_token": response.session.access_token,
@@ -335,9 +373,11 @@ async def get_me(user=Depends(require_auth)):
             "created_at": profile.get("created_at"),
         }
     except Exception as e:
+        metadata = getattr(user, "user_metadata", {}) or {}
         return {
             "id": str(user.id),
             "email": user.email,
+            "username": metadata.get("username", "User"),
         }
 
 @app.post("/api/auth/logout")
@@ -574,11 +614,9 @@ async def detect_waste(
 
 # --- SAVE FINAL REPORT ---
 @app.post("/api/reports")
-async def save_final_report(report_data: dict, user=Depends(get_current_user)):
+async def save_final_report(report_data: dict, user=Depends(require_auth)):
     """Saves the final, user-edited report to Supabase."""
-    # Attach user_id if authenticated
-    if user:
-        report_data["user_id"] = str(user.id)
+    report_data["user_id"] = str(user.id)
     
     success = save_report_to_supabase(report_data)
     if success:
@@ -588,8 +626,8 @@ async def save_final_report(report_data: dict, user=Depends(get_current_user)):
 
 # --- DELETE REPORT ---
 @app.delete("/api/reports/{report_id}")
-async def delete_report(report_id: str, user=Depends(get_current_user)):
-    """Delete a report. Owner auth is required only for user-owned reports."""
+async def delete_report(report_id: str, user=Depends(require_auth)):
+    """Delete a report. Users can delete their own reports; legacy unowned reports are removable by logged-in users."""
     try:
         if not supabase:
             raise HTTPException(status_code=500, detail="Supabase not configured")
@@ -603,11 +641,8 @@ async def delete_report(report_id: str, user=Depends(get_current_user)):
         report = report_response.data[0]
         
         report_user_id = report.get("user_id")
-        if report_user_id:
-            if not user:
-                raise HTTPException(status_code=401, detail="Authentication required")
-            if report_user_id != str(user.id):
-                raise HTTPException(status_code=403, detail="You can only delete your own reports")
+        if report_user_id and report_user_id != str(user.id):
+            raise HTTPException(status_code=403, detail="You can only delete your own reports")
         
         # Try to delete the associated image from Supabase Storage
         image_url = report.get("image_url", "")
@@ -641,6 +676,15 @@ async def get_report(report_id: str):
             raise HTTPException(status_code=404, detail="Report not found")
         
         row = response.data
+        username = "Anonymous"
+        if row.get("user_id"):
+            try:
+                profile_response = supabase.table("profiles").select("username").eq("id", str(row.get("user_id"))).limit(1).execute()
+                if profile_response.data:
+                    username = profile_response.data[0].get("username") or username
+            except Exception as profile_err:
+                print(f"Supabase profile load warning: {profile_err}")
+
         return {
             "id": row.get("id"),
             "category": row.get("category"),
@@ -662,6 +706,7 @@ async def get_report(report_id: str):
             "status": row.get("status"),
             "timestamp": row.get("created_at"),
             "user_id": row.get("user_id"),
+            "username": username,
         }
     except HTTPException:
         raise

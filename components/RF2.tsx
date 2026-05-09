@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Camera, Upload, Loader2, AlertCircle, CheckCircle, Video, MapPin, Scan, Send, Trash, Edit2, MousePointerClick, X, Plus, Minus, Tag } from 'lucide-react';
-import { detectWaste } from '../services/apiService';
+import { detectWaste, getAuthHeaders } from '../services/apiService';
 import { fileToData } from '../services/geminiService';
 import { DetectionResult, Language, WasteDataPoint, GeminiAnalysisResult } from '../types';
 import { TRANSLATIONS } from '../constants';
@@ -230,17 +230,24 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
 
         try {
             const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-            await fetch(`${API_URL}/api/reports`, {
+            const saveResponse = await fetch(`${API_URL}/api/reports`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify(finalRecord)
             });
+            if (!saveResponse.ok) {
+                const error = await saveResponse.json().catch(() => null);
+                throw new Error(error?.detail || 'Failed to save final report');
+            }
             console.log("Final edited report saved to database!");
         } catch (e) {
             console.error("Failed to save final report:", e);
+            setError(e instanceof Error ? e.message : "Failed to save final report");
+            setShowConfirm(false);
+            return;
         }
 
-        onReportSubmit(updatedResult, finalMediaData, { lat: finalLat, lng: finalLng }, locationName, initialData?.id);
+        onReportSubmit(updatedResult, finalMediaData, { lat: finalLat, lng: finalLng }, locationName, finalReportId);
         setShowConfirm(false);
         handleDiscard();
     };

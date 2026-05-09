@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, ChevronDown, ChevronUp, Tag, Image as ImageIcon, MessageSquare, Trash2, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, ChevronDown, ChevronUp, Tag, Image as ImageIcon, MessageSquare, Trash2, Loader2, User } from 'lucide-react';
 import { Language } from '../types';
 
 interface CardProps {
@@ -14,6 +14,8 @@ interface CardProps {
         status?: string;
         category?: string; 
         waste_distribution?: Record<string, number>; 
+        user_id?: string | null;
+        username?: string;
     };
     lang: Language;
     onDelete?: (id: string) => void;
@@ -84,6 +86,7 @@ const ReportHistoryCard = ({ report, lang, onDelete, isDeleting = false }: CardP
                         <div className="flex items-center gap-4 text-xs text-slate-400">
                             <span className="flex items-center gap-1"><Calendar size={12} /> {safeDate}</span>
                             <span className="flex items-center gap-1"><MapPin size={12} /> {Number(report.latitude).toFixed(4)}, {Number(report.longitude).toFixed(4)}</span>
+                            <span className="flex items-center gap-1"><User size={12} /> {report.username || 'Anonymous'}</span>
                         </div>
                     </div>
                 </div>

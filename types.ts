@@ -20,6 +20,8 @@ export interface BoundingBox {
 
 export interface WasteDataPoint {
   id: string;
+  user_id?: string | null;
+  username?: string;
   lat: number;
   lng: number;
   type: string;
@@ -57,3 +59,15 @@ export interface DetectionResult {
 }
 
 export type GeminiAnalysisResult = DetectionResult; // Alias for backward compat
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  username: string;
+}
+
+export interface AuthSession {
+  access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
+}
