@@ -1,12 +1,8 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Camera, Upload, Loader2, AlertCircle, CheckCircle, Video, MapPin, Scan, Send, Trash, Edit2, MousePointerClick, X, Plus, Minus, Tag } from 'lucide-react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { Camera, Upload, Loader2, AlertCircle, CheckCircle, Video, MapPin, Send, Trash, Edit2, X, Plus, Minus, Tag } from 'lucide-react';
 import { detectWaste, getAuthHeaders } from '../services/apiService';
-import { fileToData } from '../services/geminiService';
-import { DetectionResult, Language, WasteDataPoint, GeminiAnalysisResult } from '../types';
+import { Language, WasteDataPoint, GeminiAnalysisResult, Severity } from '../types';
 import { TRANSLATIONS } from '../constants';
-
-// Declare EXIF global for the exif-js library imported in index.html
-declare const EXIF: any;
 
 interface ReportFormProps {
     lang: Language;
@@ -16,6 +12,7 @@ interface ReportFormProps {
 
 const WASTE_CATEGORIES = ["Plastic", "Metal", "Glass", "Paper", "Fabric", "Rubber", "Wood", "Other"];
 const SEVERITY_LEVELS = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+type ResolvedLocation = { lat: number; lng: number; name: string };
 
 const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialData }) => {
     const [selectedMedia, setSelectedMedia] = useState<{ url: string, type: 'image' | 'video' } | null>(null);
@@ -24,7 +21,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     const [error, setError] = useState<string | null>(null);
 
     // Editable States
-    const [customReportName, setCustomReportName] = useState<string>(''); // NEW: State for custom name
+    const [customReportName, setCustomReportName] = useState<string>('');
     const [wasteDistribution, setWasteDistribution] = useState<Record<string, number>>({});
     const [editedSeverity, setEditedSeverity] = useState<string>("MEDIUM");
     const [showConfirm, setShowConfirm] = useState(false);
@@ -37,9 +34,47 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     // Refs for precise positioning
     const containerRef = useRef<HTMLDivElement>(null);
     const mediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
+    const objectUrlRef = useRef<string | null>(null);
     const [overlayStyle, setOverlayStyle] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 
     const t = TRANSLATIONS[lang];
+
+    const setMediaPreview = (url: string, type: 'image' | 'video', ownsObjectUrl = false) => {
+        if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = ownsObjectUrl ? url : null;
+        setSelectedMedia({ url, type });
+    };
+
+    useEffect(() => () => {
+        if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    }, []);
+
+    useEffect(() => {
+        if (!initialData) return;
+
+        const severity = initialData.severity || Severity.MEDIUM;
+        setResult({
+            wasteType: [initialData.type || 'Other'],
+            category: initialData.type || 'Other',
+            subCategory: initialData.subType,
+            severity,
+            description: lang === Language.EN
+                ? `Existing report for ${initialData.locationName}. Review and update the details below.`
+                : `${initialData.locationName} 的現有報告。請檢查並更新以下資料。`,
+            estimatedWeightKg: 0,
+            cleanupPriority: severity === Severity.HIGH || severity === Severity.CRITICAL ? 'High' : 'Medium',
+            boundingBoxes: initialData.boundingBoxes || [],
+            waste_distribution: initialData.waste_distribution || {},
+            unique_item_count: initialData.unique_item_count || 0,
+            timestamp: initialData.timestamp,
+            imageUrl: initialData.mediaUrl,
+        });
+        setCustomReportName(initialData.id);
+        setEditLocation({ lat: String(initialData.lat), lng: String(initialData.lng) });
+        setLocationName(initialData.locationName);
+        setLocationStatus(lang === Language.EN ? 'Loaded existing report' : '已載入現有報告');
+        if (initialData.mediaUrl) setMediaPreview(initialData.mediaUrl, initialData.mediaType);
+    }, [initialData, lang]);
 
     useEffect(() => {
         if (result) {
@@ -146,7 +181,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
             let objectUrl = URL.createObjectURL(file);
 
             const isVideo = file.type.startsWith('video');
-            setSelectedMedia({ url: objectUrl, type: isVideo ? 'video' : 'image' });
+            setMediaPreview(objectUrl, isVideo ? 'video' : 'image', true);
 
             if (file.name.toLowerCase().endsWith('.heic')) {
                 try {
@@ -161,19 +196,20 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                         type: 'image/jpeg'
                     });
                     objectUrl = URL.createObjectURL(conversionResult);
-                    setSelectedMedia({ url: objectUrl, type: 'image' });
+                    setMediaPreview(objectUrl, 'image', true);
                 } catch (err) {
                     console.error('HEIC conversion failed:', err);
                 }
             }
 
-            await extractLocationFromFile(file);
+            const detectedLocation = await extractLocationFromFile(file);
 
             setIsAnalyzing(true);
-            const lat = editLocation.lat ? parseFloat(editLocation.lat) : 22.3193;
-            const lng = editLocation.lng ? parseFloat(editLocation.lng) : 114.1694;
-
-            const analysis = await detectWaste(processedFile, { lat, lng }, locationName);
+            const analysis = await detectWaste(
+                processedFile,
+                { lat: detectedLocation.lat, lng: detectedLocation.lng },
+                detectedLocation.name,
+            );
             setResult(analysis);
 
         } catch (err) {
@@ -185,7 +221,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     };
 
     const handlePreSubmit = () => {
-        if (!result || !selectedMedia) return;
+        if (!result || (!selectedMedia && !initialData)) return;
         const finalLat = parseFloat(editLocation.lat);
         const finalLng = parseFloat(editLocation.lng);
         if (isNaN(finalLat) || isNaN(finalLng)) {
@@ -196,7 +232,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     };
 
     const handleFinalSubmit = async () => {
-        if (!result || !selectedMedia) return;
+        if (!result || (!selectedMedia && !initialData)) return;
         const finalLat = parseFloat(editLocation.lat);
         const finalLng = parseFloat(editLocation.lng);
 
@@ -206,14 +242,13 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
             severity: editedSeverity
         } as GeminiAnalysisResult;
 
-        const backendImageUrl = (result as any).imageUrl;
+        const backendImageUrl = result.imageUrl;
         const finalMediaData = {
-            type: selectedMedia.type,
-            url: backendImageUrl ? backendImageUrl : selectedMedia.url
+            type: selectedMedia?.type || initialData?.mediaType || 'image',
+            url: backendImageUrl || selectedMedia?.url || initialData?.mediaUrl || '',
         };
 
-        // NEW: Check if user entered a custom name, otherwise fallback to RPT- timestamp
-        const finalReportId = customReportName.trim() !== '' ? customReportName.trim() : `RPT-${Date.now()}`;
+        const finalReportId = initialData?.id || (customReportName.trim() !== '' ? customReportName.trim() : `RPT-${Date.now()}`);
 
         const finalRecord = {
             ...updatedResult,
@@ -239,7 +274,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                 const error = await saveResponse.json().catch(() => null);
                 throw new Error(error?.detail || 'Failed to save final report');
             }
-            console.log("Final edited report saved to database!");
         } catch (e) {
             console.error("Failed to save final report:", e);
             setError(e instanceof Error ? e.message : "Failed to save final report");
@@ -253,11 +287,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
     };
 
     const handleDiscard = () => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
         setSelectedMedia(null);
         setResult(null);
         setWasteDistribution({});
         setEditedSeverity("MEDIUM");
-        setCustomReportName(''); // Reset custom name
+        setCustomReportName('');
         setOverlayStyle(null);
         setError(null);
         setEditLocation({ lat: '', lng: '' });
@@ -265,65 +303,32 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         setShowConfirm(false);
     };
 
-    const extractLocationFromFile = async (file: File): Promise<void> => {
+    const extractLocationFromFile = async (file: File): Promise<ResolvedLocation> => {
         setLocationStatus("Reading GPS data...");
 
-        if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+        if (file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.heic')) {
             try {
                 const exifr = await import('exifr');
-                const exifData = await exifr.parse(file);
+                const exifData = await exifr.gps(file);
 
-                if (exifData?.latitude && exifData?.longitude) {
+                if (Number.isFinite(exifData?.latitude) && Number.isFinite(exifData?.longitude)) {
                     setEditLocation({
                         lat: exifData.latitude.toFixed(6),
                         lng: exifData.longitude.toFixed(6)
                     });
-                    await getAddressFromCoords(exifData.latitude, exifData.longitude);
-                    setLocationStatus("GPS found in HEIC file");
-                    return;
+                    const name = await getAddressFromCoords(exifData.latitude, exifData.longitude);
+                    setLocationStatus("GPS found in image");
+                    return { lat: exifData.latitude, lng: exifData.longitude, name };
                 }
             } catch (err) {
-                console.log('exifr failed:', err);
+                console.warn('Image GPS metadata could not be read:', err);
             }
         }
 
-        if (typeof EXIF !== 'undefined' && file.type.startsWith('image/')) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                const tempUrl = URL.createObjectURL(file);
-                img.src = tempUrl;
-
-                img.onload = () => {
-                    EXIF.getData(img, async function (this: any) {
-                        const lat = EXIF.getTag(this, "GPSLatitude");
-                        const lon = EXIF.getTag(this, "GPSLongitude");
-
-                        if (lat && lon) {
-                            let decimalLat = toDecimal(lat);
-                            let decimalLon = toDecimal(lon);
-                            const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
-                            const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
-
-                            if (latRef === "S") decimalLat = -decimalLat;
-                            if (lonRef === "W") decimalLon = -decimalLon;
-
-                            setEditLocation({ lat: decimalLat.toFixed(6), lng: decimalLon.toFixed(6) });
-                            getAddressFromCoords(decimalLat, decimalLon);
-                            setLocationStatus("GPS found in image");
-                        } else {
-                            useDeviceLocation();
-                        }
-                        URL.revokeObjectURL(tempUrl);
-                        resolve();
-                    });
-                };
-            });
-        } else {
-            await useDeviceLocation();
-        }
+        return useDeviceLocation();
     };
 
-    const useDeviceLocation = async (): Promise<void> => {
+    const useDeviceLocation = async (): Promise<ResolvedLocation> => {
         return new Promise((resolve) => {
             setLocationStatus(lang === Language.EN ? "Getting device location..." : "獲取裝置位置...");
             if (navigator.geolocation) {
@@ -331,28 +336,27 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                     async (pos) => {
                         const { latitude, longitude } = pos.coords;
                         setEditLocation({ lat: latitude.toFixed(6), lng: longitude.toFixed(6) });
-                        await getAddressFromCoords(latitude, longitude);
+                        const name = await getAddressFromCoords(latitude, longitude);
                         setLocationStatus("Device location found");
-                        resolve();
+                        resolve({ lat: latitude, lng: longitude, name });
                     },
-                    () => {
+                    async () => {
                         setLocationStatus("Device location failed, using default");
-                        useDefaultHK();
-                        resolve();
+                        resolve(await useDefaultHK());
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else {
-                useDefaultHK();
-                resolve();
+                void useDefaultHK().then(resolve);
             }
         });
     };
 
-    const useDefaultHK = () => {
+    const useDefaultHK = async (): Promise<ResolvedLocation> => {
         const def = { lat: 22.3193, lng: 114.1694 };
         setEditLocation({ lat: def.lat.toFixed(6), lng: def.lng.toFixed(6) });
-        getAddressFromCoords(def.lat, def.lng);
+        const name = await getAddressFromCoords(def.lat, def.lng);
+        return { ...def, name };
     };
 
     const getAddressFromCoords = async (lat: number, lng: number) => {
@@ -371,12 +375,21 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
         }
     };
 
-    const toDecimal = (number: any[]) => {
-        return number[0].numerator + number[1].numerator / (60 * number[1].denominator) + number[2].numerator / (3600 * number[2].denominator);
-    };
-
     return (
         <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-xl overflow-hidden animate-fade-in relative">
+
+            {initialData && (
+                <div className="flex items-center gap-3 border-b border-emerald-500/20 bg-emerald-500/10 p-4">
+                    <div className="rounded-full bg-emerald-500/20 p-2 text-emerald-400"><MapPin size={20} /></div>
+                    <div>
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-400">
+                            {lang === Language.EN ? 'Updating existing report' : '正在更新現有報告'}
+                        </h3>
+                        <p className="font-medium text-white">{initialData.locationName}</p>
+                        <p className="mt-0.5 text-xs text-slate-400">{initialData.id}</p>
+                    </div>
+                </div>
+            )}
 
             {/* Confirmation Modal */}
             {showConfirm && (
@@ -533,7 +546,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                     {result && (
                         <div className="space-y-4 animate-fade-in flex flex-col h-full">
 
-                            {/* NEW: Custom Report Name Field */}
                             <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                                 <span className="text-xs text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-2">
                                     <Tag size={12} /> {lang === Language.EN ? "Report Name (Optional)" : "報告名稱 (可選)"}
@@ -542,8 +554,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
                                     type="text"
                                     value={customReportName}
                                     onChange={(e) => setCustomReportName(e.target.value)}
+                                    disabled={Boolean(initialData)}
                                     placeholder={lang === Language.EN ? "e.g. Discovery Bay Cleanup" : "例如：發現灣清理區"}
-                                    className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:border-emerald-500 outline-none"
+                                    className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:border-emerald-500 outline-none disabled:cursor-not-allowed disabled:opacity-60"
                                 />
                             </div>
 

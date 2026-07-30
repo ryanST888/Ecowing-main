@@ -26,26 +26,21 @@ export interface WasteDataPoint {
   lng: number;
   type: string;
   subType?: string;
+  description?: string;
   severity: Severity;
   timestamp: string;
   mediaType: 'image' | 'video';
-  mediaUrl?: string; // Base64 or URL
+  mediaUrl?: string;
   verified: boolean;
+  status?: 'pending' | 'verified' | 'cleaned';
   locationName: string;
-  boundingBoxes?: BoundingBox[]; // Store coordinates for the map/image overlay
+  boundingBoxes?: BoundingBox[];
   waste_distribution: Record<string, number>;
   unique_item_count: number;
 }
 
-export interface ChartData {
-  name: string;
-  value: number;
-  color?: string;
-}
-
-// Match backend 'DetectionResult' model
 export interface DetectionResult {
-  wasteType: string[]; // Deprecated but kept for compatibility
+  wasteType: string[];
   category: string;
   subCategory?: string;
   severity: Severity;
@@ -56,9 +51,10 @@ export interface DetectionResult {
   waste_distribution: Record<string, number>;
   unique_item_count: number;
   timestamp: string;
+  imageUrl?: string;
 }
 
-export type GeminiAnalysisResult = DetectionResult; // Alias for backward compat
+export type GeminiAnalysisResult = DetectionResult;
 
 export interface AuthUser {
   id: string;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Calendar, MapPin, ChevronDown, ChevronUp, Tag, Image as ImageIcon, MessageSquare, Trash2, Loader2, User } from 'lucide-react';
 import { Language } from '../types';
 

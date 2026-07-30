@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Language } from '../types';
+import { useMemo, useState } from 'react';
+import { Language, WasteDataPoint } from '../types';
 import { TRANSLATIONS } from '../constants';
 import {
     BarChart3, Trash2, AlertTriangle, Crosshair, FileClock,
     LayoutGrid, List as ListIcon, FolderOpen, Calendar, Loader2, User
 } from 'lucide-react';
 import ReportHistoryCard from './ReportHistoryCard';
-import { deleteReport } from '../services/apiService';
 
 interface DashboardProps {
     lang: Language;
+    reports: WasteDataPoint[];
     currentUserId?: string;
-    onDeleteReport?: (id: string) => Promise<void> | void;
+    onDeleteReport: (id: string) => Promise<void> | void;
 }
 
 export interface WasteReport {
     id: string;
     user_id?: string | null;
     username?: string;
-    timestamp: number;
+    timestamp: number | string;
     latitude: number;
     longitude: number;
     severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
@@ -29,9 +29,7 @@ export interface WasteReport {
     waste_distribution?: Record<string, number>;
 }
 
-const STATIC_REPORTS: WasteReport[] = [];
-
-const AppleDonutChart = ({ reports, lang }: { reports: any[], lang: Language }) => {
+const AppleDonutChart = ({ reports, lang }: { reports: WasteReport[], lang: Language }) => {
     const total = reports.length;
     const high = reports.filter(r => r.severity === 'HIGH' || r.severity === 'CRITICAL').length;
     const medium = reports.filter(r => r.severity === 'MEDIUM').length;
@@ -52,7 +50,6 @@ const AppleDonutChart = ({ reports, lang }: { reports: any[], lang: Language }) 
 
     return (
         <div className="relative w-56 h-56 flex items-center justify-center">
-            <style>{`@keyframes ringFill { from { stroke-dasharray: 0, 100; } }`}</style>
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                 <path className="text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                 {low > 0 && <path className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]" style={{ animation: 'ringFill 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards' }} strokeDasharray={lowDash} strokeDashoffset="0" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />}
@@ -69,19 +66,18 @@ const AppleDonutChart = ({ reports, lang }: { reports: any[], lang: Language }) 
     );
 };
 
-const AppleBarChart = ({ reports, lang }: { reports: any[], lang: Language }) => {
+const AppleBarChart = ({ reports, lang }: { reports: WasteReport[], lang: Language }) => {
     const counts: Record<string, number> = { Plastic: 0, Metal: 0, Glass: 0, Paper: 0, Fabric: 0, Rubber: 0, Wood: 0, Other: 0 };
 
     reports.forEach(r => {
+        const distribution = r.waste_distribution || {};
         let totalCounted = 0;
-        if (r.waste_distribution) {
-            Object.values(r.waste_distribution).forEach(val => {
-                totalCounted += Number(val) || 0;
-            });
-        }
+        Object.values(distribution).forEach(val => {
+            totalCounted += Number(val) || 0;
+        });
 
         if (totalCounted > 0) {
-            Object.entries(r.waste_distribution).forEach(([type, count]) => {
+            Object.entries(distribution).forEach(([type, count]) => {
                 const cat = type.toLowerCase();
                 const num = Number(count) || 0;
                 if (cat.includes('plastic')) counts.Plastic += num;
@@ -94,7 +90,7 @@ const AppleBarChart = ({ reports, lang }: { reports: any[], lang: Language }) =>
                 else counts.Other += num;
             });
         } else {
-            const cat = String(r.category || r.type || 'Other').toLowerCase();
+            const cat = String(r.category || 'Other').toLowerCase();
             if (cat.includes('plastic')) counts.Plastic++;
             else if (cat.includes('metal')) counts.Metal++;
             else if (cat.includes('glass') || cat.includes('ceramic')) counts.Glass++;
@@ -121,7 +117,6 @@ const AppleBarChart = ({ reports, lang }: { reports: any[], lang: Language }) =>
 
     return (
         <div className="flex items-end justify-between h-56 w-full px-2 gap-2">
-            <style>{`@keyframes growUp { from { height: 0; opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
             {bars.map((bar, idx) => (
                 <div key={idx} className="flex flex-col items-center w-full gap-3 group h-full justify-end relative">
                     <div className="w-full relative flex items-end h-full">
@@ -221,52 +216,25 @@ const FolderItem = ({
     );
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ lang, currentUserId, onDeleteReport }) => {
+const Dashboard = ({ lang, reports, currentUserId, onDeleteReport }: DashboardProps) => {
     const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN] || { navDashboard: "Dashboard" };
     const [viewMode, setViewMode] = useState<'list' | 'folder'>('list');
-    const [allReports, setAllReports] = useState<WasteReport[]>(STATIC_REPORTS);
     const [deletingReportId, setDeletingReportId] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchReports = async () => {
-            try {
-                const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-                const response = await fetch(`${API_URL}/api/history`);
-
-                if (response.ok) {
-                    const backendReports = await response.json();
-
-                    if (Array.isArray(backendReports)) {
-                        const safeReports: WasteReport[] = backendReports.map((item: any) => ({
-                            ...item,
-                            latitude: item.latitude !== undefined ? item.latitude : (item.lat || 0),
-                            longitude: item.longitude !== undefined ? item.longitude : (item.lng || 0),
-                            category: item.category || item.type || 'Other',
-                            waste_distribution: item.waste_distribution || {},
-                            severity: item.severity || 'MEDIUM',
-                            message: item.message || item.description || 'No description provided.',
-                            imageUrl: item.imageUrl || 'https://via.placeholder.com/400',
-                            id: item.id || `RPT-${Math.floor(Math.random() * 10000)}`,
-                            user_id: item.user_id || null,
-                            username: item.username || 'Anonymous',
-                            status: item.status || 'pending',
-                            timestamp: item.timestamp || Date.now()
-                        }));
-
-                        setAllReports([...safeReports, ...STATIC_REPORTS]);
-                    } else {
-                        setAllReports(STATIC_REPORTS);
-                    }
-                } else {
-                    setAllReports(STATIC_REPORTS);
-                }
-            } catch (e) {
-                setAllReports(STATIC_REPORTS);
-            }
-        };
-
-        fetchReports();
-    }, []);
+    const allReports = useMemo<WasteReport[]>(() => reports.map(report => ({
+        id: report.id,
+        user_id: report.user_id,
+        username: report.username,
+        timestamp: report.timestamp,
+        latitude: report.lat,
+        longitude: report.lng,
+        severity: report.severity,
+        imageUrl: report.mediaUrl,
+        message: report.description,
+        status: report.status || (report.verified ? 'verified' : 'pending'),
+        category: report.type,
+        waste_distribution: report.waste_distribution,
+    })), [reports]);
 
     const handleDeleteReport = async (reportId: string) => {
         if (!reportId || deletingReportId) return;
@@ -282,13 +250,7 @@ const Dashboard: React.FC<DashboardProps> = ({ lang, currentUserId, onDeleteRepo
         setDeletingReportId(reportId);
 
         try {
-            if (onDeleteReport) {
-                await onDeleteReport(reportId);
-            } else {
-                await deleteReport(reportId);
-            }
-
-            setAllReports(prev => prev.filter(report => report.id !== reportId));
+            await onDeleteReport(reportId);
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             window.alert(

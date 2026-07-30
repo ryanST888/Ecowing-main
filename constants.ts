@@ -1,4 +1,4 @@
-import { Language, WasteDataPoint, Severity } from './types';
+import { Language, WasteDataPoint } from './types';
 
 export const TRANSLATIONS = {
   [Language.EN]: {

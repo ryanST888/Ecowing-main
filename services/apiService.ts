@@ -1,4 +1,4 @@
-import { AuthSession, AuthUser, DetectionResult, WasteDataPoint } from '../types';
+import { AuthSession, AuthUser, DetectionResult, Severity, WasteDataPoint } from '../types';
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const apiUrl = (path: string) => `${API_BASE_URL}${path}`;
@@ -129,10 +129,41 @@ export const detectWaste = async (
 export const getHistory = async (): Promise<WasteDataPoint[]> => {
     const response = await fetch(apiUrl('/api/history'));
     if (!response.ok) {
-        console.error('Failed to fetch history');
-        return [];
+        throw new Error(await readErrorMessage(response, 'Failed to fetch history'));
     }
-    return response.json();
+
+    const history: unknown = await response.json();
+    if (!Array.isArray(history)) return [];
+
+    const severityValues = new Set(Object.values(Severity));
+    return history.map((value): WasteDataPoint => {
+        const report = value as Record<string, unknown>;
+        const severity = String(report.severity || Severity.MEDIUM).toUpperCase();
+        const mediaUrl = String(report.mediaUrl || report.imageUrl || '');
+
+        return {
+            id: String(report.id || ''),
+            user_id: report.user_id ? String(report.user_id) : null,
+            username: String(report.username || 'Anonymous'),
+            lat: Number(report.lat ?? report.latitude ?? 0),
+            lng: Number(report.lng ?? report.longitude ?? 0),
+            type: String(report.type || report.category || 'Other'),
+            subType: report.subType || report.subCategory ? String(report.subType || report.subCategory) : undefined,
+            description: report.description ? String(report.description) : undefined,
+            severity: severityValues.has(severity as Severity) ? severity as Severity : Severity.MEDIUM,
+            timestamp: String(report.timestamp || new Date().toISOString()),
+            mediaType: report.mediaType === 'video' || /\.(mp4|webm|mov)(?:$|\?)/i.test(mediaUrl) ? 'video' : 'image',
+            mediaUrl: mediaUrl || undefined,
+            verified: Boolean(report.verified),
+            status: report.status === 'verified' || report.status === 'cleaned' ? report.status : 'pending',
+            locationName: String(report.locationName || 'Unknown'),
+            boundingBoxes: Array.isArray(report.boundingBoxes) ? report.boundingBoxes as WasteDataPoint['boundingBoxes'] : [],
+            waste_distribution: report.waste_distribution && typeof report.waste_distribution === 'object'
+                ? report.waste_distribution as Record<string, number>
+                : {},
+            unique_item_count: Number(report.unique_item_count || 0),
+        };
+    });
 };
 
 export const deleteReport = async (id: string): Promise<void> => {

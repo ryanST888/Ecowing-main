@@ -1,0 +1,412 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes ringFill {
+  from { stroke-dasharray: 0 100; }
+}
+
+@keyframes growUp {
+  from { height: 0; opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: #08111f;
+    color: #e2e8f0;
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    text-rendering: optimizeLegibility;
+    transition: background-color 200ms ease-out, color 200ms ease-out;
+  }
+
+  :root[data-theme='light'] body {
+    background-color: #f4f8f4;
+    color: #17352b;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(5, 150, 105, 0.34);
+    outline-offset: 3px;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+:root[data-theme='light'] ::-webkit-scrollbar-track {
+  background: #edf3ef;
+}
+
+:root[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background: #a9bbb2;
+}
+
+:root[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
+  background: #82988d;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: #94a3b8;
+}
+
+.leaflet-control-zoom a {
+  color: #e2e8f0;
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.leaflet-control-attribution {
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.88) !important;
+}
+
+:root[data-theme='dark'] .leaflet-popup-content-wrapper,
+:root[data-theme='dark'] .leaflet-popup-tip {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+:root[data-theme='dark'] .leaflet-container a.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+}
+
+:root[data-theme='dark'] .leaflet-control-zoom a {
+  color: #e2e8f0 !important;
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+:root[data-theme='light'] .leaflet-popup-content-wrapper,
+:root[data-theme='light'] .leaflet-popup-tip {
+  background: #ffffff;
+  border-color: #d9e5dd;
+  color: #17352b;
+  box-shadow: 0 16px 40px rgba(18, 53, 42, 0.16);
+}
+
+:root[data-theme='light'] .leaflet-container a.leaflet-popup-close-button {
+  color: #60776d;
+}
+
+:root[data-theme='light'] .leaflet-control-zoom a {
+  color: #17352b !important;
+  background: #ffffff !important;
+  border-color: #d9e5dd !important;
+}
+
+:root[data-theme='light'] .leaflet-control-attribution {
+  color: #60776d;
+  background: rgba(255, 255, 255, 0.88) !important;
+}
+
+/*
+ * EcoWing's existing screens were authored with dark Tailwind utilities.
+ * The light theme remaps those shared surface utilities here so dashboards,
+ * forms, map controls, report cards, and dialogs stay synchronized.
+ */
+[data-theme='light'] {
+  --ew-canvas: #f4f8f4;
+  --ew-surface: #ffffff;
+  --ew-surface-muted: #eef5f0;
+  --ew-surface-strong: #e2eee7;
+  --ew-text: #17352b;
+  --ew-text-secondary: #526b61;
+  --ew-text-muted: #71847c;
+  --ew-border: #d9e5dd;
+  --ew-emerald: #07845d;
+  --ew-emerald-dark: #066f50;
+  --ew-yellow: #d59a00;
+  background: var(--ew-canvas) !important;
+  color: var(--ew-text) !important;
+}
+
+[data-theme='light'] [class~='bg-slate-950'],
+[data-theme='light'] [class~='bg-slate-950/90'],
+[data-theme='light'] [class~='bg-slate-950/85'],
+[data-theme='light'] [class~='bg-slate-950/65'],
+[data-theme='light'] [class~='bg-slate-950/55'],
+[data-theme='light'] [class~='bg-slate-950/52'],
+[data-theme='light'] [class~='bg-slate-950/45'] {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+}
+
+[data-theme='light'] .modal-scrim {
+  background-color: rgba(9, 30, 23, 0.48) !important;
+}
+
+[data-theme='light'] .app-header {
+  box-shadow: 0 1px 18px rgba(18, 53, 42, 0.06) !important;
+}
+
+[data-theme='light'] [class~='bg-slate-900'],
+[data-theme='light'] [class~='bg-slate-900/90'],
+[data-theme='light'] [class~='bg-slate-900/80'],
+[data-theme='light'] [class~='bg-slate-900/60'],
+[data-theme='light'] [class~='bg-slate-900/50'] {
+  background-color: var(--ew-surface-muted) !important;
+}
+
+[data-theme='light'] [class~='bg-slate-800'],
+[data-theme='light'] [class~='bg-slate-800/90'],
+[data-theme='light'] [class~='bg-slate-800/50'] {
+  background-color: var(--ew-surface) !important;
+}
+
+[data-theme='light'] [class~='bg-slate-700'],
+[data-theme='light'] [class~='bg-slate-700/50'],
+[data-theme='light'] [class~='bg-slate-600'],
+[data-theme='light'] [class~='bg-slate-500'] {
+  background-color: var(--ew-surface-strong) !important;
+}
+
+[data-theme='light'] [class~='bg-[#08111f]'],
+[data-theme='light'] [class~='bg-[#07111f]'],
+[data-theme='light'] [class~='bg-[#06131f]/92'],
+[data-theme='light'] [class~='bg-[#0a1424]'],
+[data-theme='light'] [class~='bg-[#0a1627]'],
+[data-theme='light'] [class~='bg-[#0d1728]'],
+[data-theme='light'] [class~='bg-[#0f172a]'],
+[data-theme='light'] [class~='bg-[#151e2e]'],
+[data-theme='light'] [class~='bg-[#151e2e]/60'],
+[data-theme='light'] [class~='bg-[#1a2436]'] {
+  background-color: var(--ew-surface) !important;
+}
+
+[data-theme='light'] [class~='bg-[#0b1121]'] {
+  background-color: var(--ew-surface-muted) !important;
+}
+
+[data-theme='light'] [class~='bg-white/5'],
+[data-theme='light'] [class~='bg-white/8'],
+[data-theme='light'] [class~='bg-white/10'],
+[data-theme='light'] [class~='bg-white/[0.03]'],
+[data-theme='light'] [class~='bg-white/[0.04]'],
+[data-theme='light'] [class~='bg-white/[0.05]'] {
+  background-color: rgba(255, 255, 255, 0.78) !important;
+}
+
+[data-theme='light'] [class~='text-white'] {
+  color: var(--ew-text) !important;
+}
+
+[data-theme='light'] [class~='text-slate-100'],
+[data-theme='light'] [class~='text-slate-200'],
+[data-theme='light'] [class~='text-slate-200/90'] {
+  color: #29483d !important;
+}
+
+[data-theme='light'] [class~='text-slate-300'] {
+  color: #47675b !important;
+}
+
+[data-theme='light'] [class~='text-slate-400'] {
+  color: var(--ew-text-secondary) !important;
+}
+
+[data-theme='light'] [class~='text-slate-500'] {
+  color: var(--ew-text-muted) !important;
+}
+
+[data-theme='light'] [class~='text-emerald-400'],
+[data-theme='light'] [class~='text-emerald-300'] {
+  color: #087f5b !important;
+}
+
+[data-theme='light'] [class~='text-yellow-400'],
+[data-theme='light'] [class~='text-yellow-500'],
+[data-theme='light'] [class~='text-yellow-500/70'] {
+  color: #a86f00 !important;
+}
+
+[data-theme='light'] [class~='text-red-300'],
+[data-theme='light'] [class~='text-red-400'] {
+  color: #b4232f !important;
+}
+
+[data-theme='light'] [class~='text-orange-400'] {
+  color: #b84e0d !important;
+}
+
+[data-theme='light'] [class~='text-blue-400'],
+[data-theme='light'] [class~='text-indigo-400'] {
+  color: #315fc2 !important;
+}
+
+[data-theme='light'] [class~='border-slate-800'],
+[data-theme='light'] [class~='border-slate-700'],
+[data-theme='light'] [class~='border-slate-700/50'],
+[data-theme='light'] [class~='border-slate-600'] {
+  border-color: var(--ew-border) !important;
+}
+
+[data-theme='light'] [class~='border-white/5'],
+[data-theme='light'] [class~='border-white/8'],
+[data-theme='light'] [class~='border-white/10'],
+[data-theme='light'] [class~='border-white/12'],
+[data-theme='light'] [class~='border-white/[0.08]'],
+[data-theme='light'] [class~='border-white/[0.14]'] {
+  border-color: rgba(31, 69, 52, 0.14) !important;
+}
+
+[data-theme='light'] input,
+[data-theme='light'] select,
+[data-theme='light'] textarea {
+  color: var(--ew-text) !important;
+  caret-color: var(--ew-emerald);
+}
+
+[data-theme='light'] input::placeholder,
+[data-theme='light'] textarea::placeholder {
+  color: #83958d !important;
+}
+
+[data-theme='light'] [class~='shadow-2xl'],
+[data-theme='light'] [class~='shadow-xl'],
+[data-theme='light'] [class~='shadow-lg'] {
+  box-shadow: 0 16px 40px rgba(18, 53, 42, 0.12) !important;
+}
+
+[data-theme='light'] [class~='hover:bg-slate-800']:hover,
+[data-theme='light'] [class~='hover:bg-slate-700']:hover,
+[data-theme='light'] [class~='hover:bg-slate-600']:hover,
+[data-theme='light'] [class~='hover:bg-slate-800/50']:hover {
+  background-color: #e8f0eb !important;
+}
+
+[data-theme='light'] [class~='hover:text-white']:hover {
+  color: #102d23 !important;
+}
+
+/* Preserve white labels on dark status and primary-action fills. */
+[data-theme='light'] [class*='bg-emerald-'][class~='text-white'],
+[data-theme='light'] [class*='bg-red-'][class~='text-white'],
+[data-theme='light'] [class*='bg-orange-'][class~='text-white'],
+[data-theme='light'] [class*='bg-blue-'][class~='text-white'],
+[data-theme='light'] [class*='bg-indigo-'][class~='text-white'] {
+  color: #ffffff !important;
+}
+
+/* Homepage-specific light art direction. */
+.ecowing-home-light {
+  background:
+    radial-gradient(circle at 12% 4%, rgba(5, 150, 105, 0.12), transparent 28%),
+    radial-gradient(circle at 88% 8%, rgba(245, 183, 0, 0.12), transparent 24%),
+    linear-gradient(180deg, #f8fbf8 0%, #eef6f1 100%) !important;
+}
+
+.ecowing-home-light .home-ambient {
+  background: linear-gradient(180deg, rgba(248, 251, 248, 0.35), rgba(244, 248, 244, 0.96)) !important;
+}
+
+.ecowing-home-light .home-grid {
+  opacity: 0.2 !important;
+  background-image:
+    linear-gradient(rgba(23, 53, 43, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 53, 43, 0.12) 1px, transparent 1px) !important;
+}
+
+.ecowing-home-light .home-hero-image {
+  opacity: 0.2 !important;
+  filter: saturate(0.7) contrast(0.85) brightness(1.18);
+}
+
+.ecowing-home-light .home-hero-overlay {
+  background:
+    linear-gradient(180deg, rgba(248, 251, 248, 0.3), rgba(244, 248, 244, 0.82) 48%, #f4f8f4 100%) !important;
+}
+
+.ecowing-home-light .home-copy-halo {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.62) 50%, transparent 78%) !important;
+}
+
+.ecowing-home-light .home-stat-card,
+.ecowing-home-light .home-panel {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(31, 69, 52, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(18, 53, 42, 0.09);
+}
+
+.ecowing-home-light .home-cta {
+  background:
+    radial-gradient(circle at 12% 20%, rgba(5, 150, 105, 0.15), transparent 34%),
+    radial-gradient(circle at 88% 20%, rgba(245, 183, 0, 0.15), transparent 30%),
+    #ffffff !important;
+  border-color: rgba(31, 69, 52, 0.14) !important;
+  box-shadow: 0 20px 55px rgba(18, 53, 42, 0.1);
+}
+
+[data-theme='light'] .on-photo [class~='text-white'],
+[data-theme='light'] .on-photo[class~='text-white'],
+[data-theme='light'] .on-photo [class~='text-slate-100'],
+[data-theme='light'] .on-photo [class~='text-slate-200'],
+[data-theme='light'] .on-photo [class~='text-slate-200/90'] {
+  color: #ffffff !important;
+}
+
+[data-theme='light'] .on-photo [class~='text-slate-300'] {
+  color: #e2e8f0 !important;
+}
+
+[data-theme='light'] .on-photo [class~='text-slate-400'],
+[data-theme='light'] .on-photo [class~='text-slate-500'] {
+  color: #cbd5e1 !important;
+}
+
+[data-theme='light'] .on-photo [class~='border-white/5'],
+[data-theme='light'] .on-photo [class~='border-white/8'],
+[data-theme='light'] .on-photo [class~='border-white/10'],
+[data-theme='light'] .on-photo [class~='border-white/12'],
+[data-theme='light'] .on-photo [class~='border-white/[0.08]'],
+[data-theme='light'] .on-photo [class~='border-white/[0.14]'] {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

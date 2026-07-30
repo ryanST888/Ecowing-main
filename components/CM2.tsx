@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { WasteDataPoint, Severity, Language } from '../types';
-import { TRANSLATIONS } from '../constants';
-import { Navigation, Filter, Calendar, Layers, Map as MapIcon, Flame, AlertTriangle } from 'lucide-react';
+import { Filter, Calendar, Layers, Map as MapIcon, Flame, AlertTriangle } from 'lucide-react';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
@@ -9,6 +8,7 @@ import 'leaflet.heat';
 interface CoastalMapProps {
     data: WasteDataPoint[];
     lang: Language;
+    theme: 'dark' | 'light';
     onVerify?: (report: WasteDataPoint) => void;
     onDelete?: (id: string) => void;
     onSiteClick?: (locationName: string) => void;
@@ -17,6 +17,10 @@ interface CoastalMapProps {
 const TILE_LAYERS = {
     DARK: {
         url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        attribution: '&copy; OpenStreetMap &copy; CARTO'
+    },
+    LIGHT: {
+        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         attribution: '&copy; OpenStreetMap &copy; CARTO'
     },
     SATELLITE: {
@@ -33,21 +37,24 @@ const HEATMAP_GRADIENT = {
     1.0: '#ef4444'
 };
 
-const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete, onSiteClick }) => {
+const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, theme, onVerify, onDelete, onSiteClick }) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
     const tileLayerRef = useRef<L.TileLayer | null>(null);
     const markerLayerRef = useRef<L.LayerGroup | null>(null);
     const heatLayerRef = useRef<L.Layer | null>(null);
 
-    const t = TRANSLATIONS[lang] || TRANSLATIONS[Language.EN];
-
-    const [activeLayer, setActiveLayer] = useState<'DARK' | 'SATELLITE'>('DARK');
+    const themeBaseLayer = theme === 'light' ? 'LIGHT' : 'DARK';
+    const [activeLayer, setActiveLayer] = useState<'DARK' | 'LIGHT' | 'SATELLITE'>(themeBaseLayer);
     const [viewMode, setViewMode] = useState<'MARKERS' | 'HEATMAP'>('MARKERS');
 
     const [filterType, setFilterType] = useState<string>('ALL');
     const [filterSeverity, setFilterSeverity] = useState<string>('ALL');
     const [dateRange, setDateRange] = useState<'ALL' | 'WEEK' | 'MONTH'>('ALL');
+
+    useEffect(() => {
+        setActiveLayer(current => current === 'SATELLITE' ? current : themeBaseLayer);
+    }, [themeBaseLayer]);
 
     const getSeverityWeight = (severity: Severity): number => {
         switch (severity) {
@@ -70,16 +77,7 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
         const now = new Date();
 
         return safeData
-            .map((point: any) => {
-                const finalLat = point.lat !== undefined ? Number(point.lat) : Number(point.latitude);
-                const finalLng = point.lng !== undefined ? Number(point.lng) : Number(point.longitude);
-
-                return {
-                    ...point,
-                    lat: finalLat,
-                    lng: finalLng
-                };
-            })
+            .map(point => ({ ...point, lat: Number(point.lat), lng: Number(point.lng) }))
             .filter(point => {
                 if (isNaN(point.lat) || isNaN(point.lng)) return false;
                 if (filterType !== 'ALL' && point.type !== filterType) return false;
@@ -150,9 +148,9 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
 
             filteredData.forEach(point => {
                 let color = '#10b981';
-                if (point.severity === Severity.MEDIUM || point.severity === 'MEDIUM') color = '#facc15';
-                if (point.severity === Severity.HIGH || point.severity === 'HIGH') color = '#f97316';
-                if (point.severity === Severity.CRITICAL || point.severity === 'CRITICAL') color = '#ef4444';
+                if (point.severity === Severity.MEDIUM) color = '#facc15';
+                if (point.severity === Severity.HIGH) color = '#f97316';
+                if (point.severity === Severity.CRITICAL) color = '#ef4444';
 
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',
@@ -163,31 +161,71 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
 
                 const marker = L.marker([point.lat, point.lng], { icon: customIcon });
 
-                const btnId = `verify-btn-${point.id}`;
-                const verifyText = lang === Language.EN ? "Verify Status" : "驗證狀態";
+                const popup = document.createElement('div');
+                popup.className = 'min-w-[220px] space-y-2 p-1 font-sans text-slate-200';
 
-                const popupContent = `
-                  <div class="p-2 font-sans text-slate-800 min-w-[200px]">
-                    <h3 class="font-bold text-sm mb-1">${point.locationName || (lang === Language.EN ? "Unknown Location" : "未知位置")}</h3>
-                    <div class="text-xs text-slate-600 mb-2">
-                      <span class="font-bold" style="color:${color}">${point.severity || "UNKNOWN"}</span> • ${point.type || "Waste"}
-                    </div>
-                    ${onVerify ? `<button id="${btnId}" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-1.5 px-3 rounded transition-colors">${verifyText}</button>` : ''}
-                  </div>
-                `;
+                const header = document.createElement('div');
+                header.className = 'flex items-start justify-between gap-3';
 
-                marker.bindPopup(popupContent);
+                const title = document.createElement(onSiteClick ? 'button' : 'h3');
+                title.className = 'text-left text-sm font-bold text-white hover:text-emerald-400';
+                title.textContent = point.locationName || (lang === Language.EN ? 'Unknown Location' : '未知位置');
+                if (onSiteClick) {
+                    title.addEventListener('click', () => {
+                        onSiteClick(point.locationName);
+                        marker.closePopup();
+                    });
+                }
+                header.appendChild(title);
 
-                marker.on('popupopen', () => {
-                    const btn = document.getElementById(btnId);
-                    if (btn && onVerify) {
-                        btn.onclick = (e) => {
-                            e.stopPropagation();
-                            onVerify(point);
-                            marker.closePopup();
-                        };
-                    }
-                });
+                if (onDelete) {
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'text-xs font-semibold text-red-400 hover:text-red-300';
+                    deleteButton.textContent = lang === Language.EN ? 'Delete' : '刪除';
+                    deleteButton.addEventListener('click', () => {
+                        onDelete(point.id);
+                        marker.closePopup();
+                    });
+                    header.appendChild(deleteButton);
+                }
+                popup.appendChild(header);
+
+                const summary = document.createElement('div');
+                summary.className = 'text-xs text-slate-300';
+                const severity = document.createElement('span');
+                severity.className = 'font-bold';
+                severity.style.color = color;
+                severity.textContent = point.severity || 'UNKNOWN';
+                summary.append(severity, document.createTextNode(` • ${point.type || 'Waste'}`));
+                popup.appendChild(summary);
+
+                if (point.mediaUrl) {
+                    const media = point.mediaType === 'video'
+                        ? document.createElement('video')
+                        : document.createElement('img');
+                    media.src = point.mediaUrl;
+                    media.className = 'h-24 w-full rounded object-cover bg-black';
+                    if (media instanceof HTMLVideoElement) media.controls = true;
+                    popup.appendChild(media);
+                }
+
+                const timestamp = document.createElement('div');
+                timestamp.className = 'text-[10px] text-slate-400';
+                timestamp.textContent = new Date(point.timestamp).toLocaleString();
+                popup.appendChild(timestamp);
+
+                if (onVerify) {
+                    const verifyButton = document.createElement('button');
+                    verifyButton.className = 'w-full rounded bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500';
+                    verifyButton.textContent = lang === Language.EN ? 'Verify / Update Status' : '驗證 / 更新狀態';
+                    verifyButton.addEventListener('click', () => {
+                        onVerify(point);
+                        marker.closePopup();
+                    });
+                    popup.appendChild(verifyButton);
+                }
+
+                marker.bindPopup(popup);
 
                 markerLayerRef.current?.addLayer(marker);
             });
@@ -200,7 +238,7 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
             const heatPoints = filteredData.map(p => [
                 p.lat,
                 p.lng,
-                getSeverityWeight(p.severity as Severity || Severity.MEDIUM)
+                getSeverityWeight((p.severity || Severity.MEDIUM) as Severity)
             ]);
 
             if (heatPoints.length > 0) {
@@ -217,13 +255,13 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
             }
         }
 
-    }, [filteredData, viewMode, lang, onVerify]);
+    }, [filteredData, viewMode, lang, onVerify, onDelete, onSiteClick]);
 
     return (
         <div className="relative w-full h-[700px] bg-[#0b1121] rounded-xl overflow-hidden border border-slate-700 shadow-2xl flex flex-col group">
 
-            <div className="absolute top-4 right-4 z-[500] flex flex-col items-end gap-3 max-w-[90%] pointer-events-none">
-                <div className="pointer-events-auto bg-slate-800/90 backdrop-blur-md p-2 rounded-lg border border-slate-600 shadow-xl flex gap-2">
+            <div className="absolute top-4 left-4 right-4 sm:left-auto z-[500] flex flex-col items-end gap-3 sm:max-w-[90%] pointer-events-none">
+                <div className="pointer-events-auto bg-slate-800/90 backdrop-blur-md p-2 rounded-lg border border-slate-600 shadow-xl flex flex-wrap justify-end gap-2 max-w-full">
                     <div className="relative">
                         <Filter size={14} className="absolute left-2.5 top-2 text-slate-400" />
                         <select
@@ -250,11 +288,24 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
                             <option value={Severity.LOW}>{lang === Language.EN ? 'Low' : '低'}</option>
                         </select>
                     </div>
+
+                    <div className="relative">
+                        <Calendar size={14} className="absolute left-2.5 top-2 text-slate-400" />
+                        <select
+                            value={dateRange}
+                            onChange={(event) => setDateRange(event.target.value as 'ALL' | 'WEEK' | 'MONTH')}
+                            className="bg-slate-700 text-white text-xs rounded pl-8 pr-3 py-1.5 border border-slate-600 outline-none cursor-pointer hover:bg-slate-600"
+                        >
+                            <option value="ALL">{lang === Language.EN ? 'All Time' : '所有時間'}</option>
+                            <option value="WEEK">{lang === Language.EN ? 'Past Week' : '過去一週'}</option>
+                            <option value="MONTH">{lang === Language.EN ? 'Past Month' : '過去一月'}</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div className="flex gap-2 pointer-events-auto">
                     <button
-                        onClick={() => setActiveLayer(prev => prev === 'DARK' ? 'SATELLITE' : 'DARK')}
+                        onClick={() => setActiveLayer(prev => prev === 'SATELLITE' ? themeBaseLayer : 'SATELLITE')}
                         className="bg-slate-800/90 hover:bg-slate-700 p-2 rounded-lg border border-slate-600 text-white shadow-xl transition-all"
                         title={lang === Language.EN ? "Switch Map Style" : "切換地圖樣式"}
                     >
@@ -305,7 +356,7 @@ const CoastalMap: React.FC<CoastalMapProps> = ({ data, lang, onVerify, onDelete,
                         </div>
                     ) : (
                         <div>
-                            <div className="h-2 w-full rounded-full bg-gradient-to-r from-blue-500 via-green-400 via-yellow-400 to-red-500 mb-2"></div>
+                            <div className="mb-2 h-2 w-full rounded-full bg-[linear-gradient(90deg,#3b82f6_0%,#4ade80_40%,#facc15_70%,#ef4444_100%)]"></div>
                             <div className="flex justify-between text-[10px] text-slate-400 font-medium">
                                 <span>{lang === Language.EN ? 'Low' : '低'}</span>
                                 <span>{lang === Language.EN ? 'Critical' : '極高'}</span>

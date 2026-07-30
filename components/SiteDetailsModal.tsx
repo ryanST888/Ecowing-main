@@ -1,30 +1,31 @@
-import React from 'react';
 import { WasteDataPoint, Language } from '../types';
 import { MapPin, X, BarChart3, AlertTriangle } from 'lucide-react';
+
+export interface SiteDetailsData {
+    locationName: string;
+    totalItems: number;
+    reports: number;
+    severity: string;
+    lat?: number;
+    lng?: number;
+    wasteDistribution?: Record<string, number>;
+}
 
 interface SiteDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    siteData: {
-        locationName: string;
-        totalItems: number;
-        reports: number;
-        severity: string;
-        lat?: number;
-        lng?: number;
-        wasteDistribution?: Record<string, number>;
-    };
+    siteData: SiteDetailsData;
     reports: WasteDataPoint[];
     lang: Language;
 }
 
-const SiteDetailsModal: React.FC<SiteDetailsModalProps> = ({
+const SiteDetailsModal = ({
     isOpen,
     onClose,
     siteData,
     reports,
     lang
-}) => {
+}: SiteDetailsModalProps) => {
     if (!isOpen) return null;
 
     return (
@@ -48,7 +49,6 @@ const SiteDetailsModal: React.FC<SiteDetailsModalProps> = ({
                 </div>
 
                 <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
-                    {/* Simple Waste Summary */}
                     <div className="mb-6">
                         <h3 className="text-lg font-semibold mb-3 text-white flex items-center gap-2">
                             <BarChart3 size={20} />
@@ -68,20 +68,8 @@ const SiteDetailsModal: React.FC<SiteDetailsModalProps> = ({
                                     {siteData.severity}
                                 </div>
                             </div>
-                            {/* <div className="bg-slate-900/50 p-3 rounded-lg">
-                                <div className="text-xs text-slate-400">Priority</div>
-                                <div className={`text-sm font-bold ${siteData.severity === 'CRITICAL' || siteData.severity === 'HIGH'
-                                        ? 'text-red-400' : 'text-yellow-400'
-                                    }`}>
-                                    {siteData.severity === 'CRITICAL' || siteData.severity === 'HIGH'
-                                        ? (lang === 'EN' ? 'HIGH' : '高')
-                                        : (lang === 'EN' ? 'MEDIUM' : '中')}
-                                </div>
-                            </div> */}
                         </div>
                     </div>
-
-                    {/* Waste Distribution */}
                     {siteData.wasteDistribution && (
                         <div className="mb-6">
                             <h4 className="font-semibold mb-2 text-white">
@@ -98,7 +86,6 @@ const SiteDetailsModal: React.FC<SiteDetailsModalProps> = ({
                         </div>
                     )}
 
-                    {/* Recent Photos */}
                     <div>
                         <h4 className="font-semibold mb-3 text-white flex items-center gap-2">
                             <AlertTriangle size={18} />

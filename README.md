@@ -1,62 +1,49 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-cd Ecowing-main-orin
-git add .
-git commit -m "Fix CORS policy for Vercel deployment"
-git push
-# Run and deploy your AI Studio app
+# EcoWing
 
-This contains everything you need to run your app locally.
+EcoWing is a React and FastAPI coastal-waste reporting system with image analysis, report history, interactive mapping, authentication, and Supabase persistence.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1oOziLY2BeAfvcbmm4QnVOcpoaxFEiTNk
+## Prerequisites
 
-## Quick Start for New Developers
+- Node.js 20+
+- Python 3.10+
+- Supabase project credentials
+- Qwen API key for image analysis
 
-**1. Clone the repo:**
+## Setup
+
 ```bash
-git clone <your-repo-url>
-cd ecowing-app
-```
-
-**2. One-Time Setup:**
-```bash
-# Frontend
 npm install
-
-# Backend
-cd backend
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts/activate
-pip install -r requirements.txt
-cd ..
+python -m venv backend/.venv
 ```
 
-**3. Setup API Key:**
-Copy `.env.example` to `.env` and paste the API key (ask the admin for it).
+Activate the Python environment, then install the backend dependencies:
+
 ```bash
-cp .env.example .env
+pip install -r backend/requirements.txt
 ```
 
-**4. Run the App:**
+Copy `.env.example` to `.env` and `backend/.env.example` to `backend/.env`. Add the backend API, Supabase, and allowed-origin values to `backend/.env`.
+
+## Run locally
+
+Start the backend from the repository root:
+
 ```bash
-# Terminal 1: Frontend
-npm run dev
-
-# Terminal 2: Backend
-cd backend
-source venv/bin/activate
-uvicorn main:app --reload
+python -m uvicorn backend.main:app --reload --port 8000
 ```
-python -m uvicorn main:app --reload
 
-## Run Locally
+Start the frontend in another terminal:
 
-**Prerequisites:**  Node.js
+```bash
+npm run dev -- --host 127.0.0.1 --port 5174
+```
 
+Open `http://127.0.0.1:5174/`.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `VITE_GEMINI_API_KEY` in [.env](.env) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Production build
+
+```bash
+npm run build
+```
+
+Deployment details for the API are in [backend/DEPLOY.md](backend/DEPLOY.md).

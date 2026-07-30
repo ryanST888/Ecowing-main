@@ -70,10 +70,6 @@ VITE_API_URL=http://your-server-ip:8000
 
 For production, put Nginx or another reverse proxy in front of it and use HTTPS.
 
-## Important Note on Data Persistence
+## Data Persistence
 
-**Warning**: These serverless/cloud platforms often have "ephemeral" filesystems. This means:
-*   When the server restarts or redeploys, **`data.json` will be reset to empty!**
-*   If you need to keep your history permanently, you should upgrade to use a real database (like PostgreSQL or MongoDB) instead of a JSON file.
-
-For this prototype, the JSON file is fine, but just know that your scan history might disappear if the server restarts.
+Reports and primary images are stored in Supabase. The backend filesystem is only a fallback when storage upload fails; fallback files may disappear when a cloud instance restarts. Configure `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` for persistent operation.

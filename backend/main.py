@@ -1,19 +1,19 @@
 import json
 import random
 import time
+import uuid
 from typing import List, Optional, Dict
-from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, Request, HTTPException, Depends
+from fastapi import FastAPI, UploadFile, File, Form, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from datetime import datetime
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
 import os
 import requests
 import base64
-import re
 
 # For Qwen API
 import dashscope
@@ -22,9 +22,11 @@ from dashscope import MultiModalConversation
 # Supabase
 from supabase import create_client, Client
 
-from dotenv import load_dotenv
 import pathlib
-load_dotenv(dotenv_path=pathlib.Path(__file__).parent / ".env", override=True)
+from dotenv import load_dotenv
+
+BACKEND_DIR = pathlib.Path(__file__).resolve().parent
+load_dotenv(dotenv_path=BACKEND_DIR / ".env", override=True)
 
 app = FastAPI()
 dashscope.api_key = os.getenv("QWEN_API_KEY", "")
@@ -32,7 +34,6 @@ dashscope.api_key = os.getenv("QWEN_API_KEY", "")
 # --- Supabase Client ---
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY) if SUPABASE_URL and SUPABASE_SERVICE_KEY else None
 
@@ -41,9 +42,18 @@ security = HTTPBearer(auto_error=False)
 
 def get_allowed_origins():
     origins = os.getenv("FRONTEND_ORIGINS", "").strip()
-    if not origins:
-        return ["*"]
-    return [origin.strip().rstrip("/") for origin in origins.split(",") if origin.strip()]
+    if origins:
+        return [origin.strip().rstrip("/") for origin in origins.split(",") if origin.strip()]
+    return [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://ecowing.hk",
+        "https://ecowing.hk",
+        "https://www.ecowing.hk",
+        "https://ecowing-main.vercel.app",
+    ]
 
 def get_public_base_url(request: Request) -> str:
     public_base_url = os.getenv("PUBLIC_BACKEND_URL", "").strip().rstrip("/")
@@ -51,26 +61,31 @@ def get_public_base_url(request: Request) -> str:
         return public_base_url
     return str(request.base_url).rstrip("/")
 
-# Allow CORS for frontend
-# 刪除 get_allowed_origins 函數，直接使用寫死的陣列
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://ecowing.hk",
-        "https://ecowing.hk",
-        "https://www.ecowing.hk",
-        "https://ecowing-main.vercel.app"
-    ],
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # --- CREATE AND MOUNT UPLOADS DIRECTORY (kept as local fallback) ---
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+UPLOAD_DIR = BACKEND_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024
+MAX_IMAGE_PIXELS = 40_000_000
+ALLOWED_IMAGE_FORMATS = {
+    "JPEG": ("image/jpeg", ".jpg"),
+    "PNG": ("image/png", ".png"),
+    "WEBP": ("image/webp", ".webp"),
+}
+ALLOWED_VIDEO_TYPES = {
+    "video/mp4": ".mp4",
+    "video/quicktime": ".mov",
+    "video/webm": ".webm",
+}
 
 # --- Data Structures ---
 TAXONOMY: Dict[str, List[str]] = {
@@ -83,8 +98,6 @@ TAXONOMY: Dict[str, List[str]] = {
     "Wood": ["Plank", "Driftwood"],
     "Other": ["Mixed"]
 }
-
-SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
 
 # --- Auth Helpers ---
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -142,6 +155,63 @@ def upload_image_to_supabase(file_bytes: bytes, filename: str, content_type: str
         print(f"Supabase Storage upload error: {e}")
         return ""
 
+def validate_upload(file_bytes: bytes, declared_content_type: str) -> tuple[str, str, bool]:
+    """Validate uploaded media and return its canonical MIME type, extension, and video flag."""
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    content_type = declared_content_type.split(";", 1)[0].strip().lower()
+
+    if content_type.startswith("image/"):
+        try:
+            with Image.open(io.BytesIO(file_bytes)) as image:
+                image_format = (image.format or "").upper()
+                width, height = image.size
+                if width <= 0 or height <= 0 or width * height > MAX_IMAGE_PIXELS:
+                    raise HTTPException(status_code=413, detail="Image dimensions are too large")
+                image.verify()
+        except HTTPException:
+            raise
+        except (UnidentifiedImageError, Image.DecompressionBombError, OSError, SyntaxError, ValueError):
+            raise HTTPException(status_code=415, detail="Invalid or unsupported image file")
+
+        image_type = ALLOWED_IMAGE_FORMATS.get(image_format)
+        if not image_type:
+            raise HTTPException(status_code=415, detail="Only JPEG, PNG, and WebP images are supported")
+
+        canonical_type, extension = image_type
+        accepted_declared_types = {canonical_type}
+        if canonical_type == "image/jpeg":
+            accepted_declared_types.update({"image/jpg", "image/pjpeg"})
+        if content_type not in accepted_declared_types:
+            raise HTTPException(status_code=415, detail="File content does not match its media type")
+        return canonical_type, extension, False
+
+    extension = ALLOWED_VIDEO_TYPES.get(content_type)
+    if extension:
+        header = file_bytes[:4096]
+        if content_type == "video/webm":
+            is_valid_video = header.startswith(b"\x1a\x45\xdf\xa3") and b"webm" in header.lower()
+        else:
+            is_valid_video = len(header) >= 12 and header[4:8] == b"ftyp"
+        if not is_valid_video:
+            raise HTTPException(status_code=415, detail="Invalid or unsupported video file")
+        return content_type, extension, True
+
+    raise HTTPException(status_code=415, detail="Only JPEG, PNG, WebP, MP4, MOV, and WebM files are supported")
+
+
+def persist_upload(file_bytes: bytes, extension: str, content_type: str, request: Request, user_id: str) -> str:
+    filename = f"{uuid.uuid4().hex}{extension}"
+    public_url = upload_image_to_supabase(file_bytes, filename, content_type, user_id)
+    if public_url:
+        return public_url
+
+    file_path = UPLOAD_DIR / filename
+    with open(file_path, "wb") as local_file:
+        local_file.write(file_bytes)
+    return f"{get_public_base_url(request)}/uploads/{filename}"
+
 # --- Supabase Data Helpers ---
 def save_report_to_supabase(report_data: dict) -> bool:
     """Save a report to Supabase reports table."""
@@ -174,7 +244,7 @@ def save_report_to_supabase(report_data: dict) -> bool:
         # Remove None values so defaults kick in
         db_record = {k: v for k, v in db_record.items() if v is not None}
         
-        supabase.table("reports").insert(db_record).execute()
+        supabase.table("reports").upsert(db_record).execute()
         return True
     except Exception as e:
         print(f"Supabase save error: {e}")
@@ -451,61 +521,60 @@ async def detect_waste(
     lat: Optional[float] = Form(None),
     lng: Optional[float] = Form(None),
     locationName: Optional[str] = Form(None),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
-    user=Depends(get_current_user),
+    user=Depends(require_auth),
 ):
     result = None
     category_name = "Other"
     sub_category_name = None
-    severity = "MEDIUM"
     waste_distribution = {}
     unique_item_count = 0
     boxes = []
     final_image_url = ""
 
-    is_video = file.content_type.startswith('video/')
+    try:
+        contents = await file.read(MAX_UPLOAD_BYTES + 1)
+    finally:
+        await file.close()
+
+    if len(contents) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="File too large (maximum 20 MB)")
+
+    content_type, extension, is_video = validate_upload(
+        contents,
+        file.content_type or "application/octet-stream",
+    )
+    user_id = str(user.id)
+    final_image_url = persist_upload(contents, extension, content_type, request, user_id)
+
+    if is_video:
+        return DetectionResult(
+            wasteType=["Other"],
+            category="Other",
+            subCategory="Video evidence",
+            severity="MEDIUM",
+            description="Video evidence uploaded for manual review.",
+            estimatedWeightKg=0,
+            cleanupPriority="Medium",
+            boundingBoxes=[],
+            waste_distribution={},
+            unique_item_count=0,
+            imageUrl=final_image_url,
+            timestamp=datetime.now().isoformat(),
+        )
     
     try:
-        if is_video:
-            print(f"Video detected: {file.content_type}")
-            raise Exception("Video processing temporarily disabled for stability")
+        try:
+            contents = compress_image_if_needed(contents)
+        except Exception as compress_err:
+            print(f"Compression warning: {compress_err}")
 
-        else:
-            contents = await file.read()
-
-            # --- SAVE THE FILE ---
-            file_extension = os.path.splitext(file.filename)[1] if file.filename else ".jpg"
-            unique_filename = f"{int(time.time() * 1000)}{file_extension}"
-            
-            # Try uploading to Supabase Storage first
-            user_id = str(user.id) if user else "anonymous"
-            supabase_url = upload_image_to_supabase(
-                contents, unique_filename, file.content_type, user_id
-            )
-            
-            if supabase_url:
-                final_image_url = supabase_url
-                print(f"File uploaded to Supabase Storage: {final_image_url}")
-            else:
-                # Fallback to local storage
-                file_path = os.path.join(UPLOAD_DIR, unique_filename)
-                with open(file_path, "wb") as f:
-                    f.write(contents)
-                final_image_url = f"{get_public_base_url(request)}/uploads/{unique_filename}"
-                print(f"File saved locally at: {file_path}")
-
-            try:
-                contents = compress_image_if_needed(contents)
-            except Exception as compress_err:
-                print(f"Compression warning: {compress_err}")
-
-            base64_image = base64.b64encode(contents).decode('utf-8')
-            TAXONOMY_CATEGORIES = ["Plastic", "Metal", "Glass", "Paper", "Fabric", "Rubber", "Wood", "Other"]
+        base64_image = base64.b64encode(contents).decode('utf-8')
+        TAXONOMY_CATEGORIES = ["Plastic", "Metal", "Glass", "Paper", "Fabric", "Rubber", "Wood", "Other"]
     
-            messages = [{
+        messages = [{
                 "role": "user",
                 "content": [
-                    {"image": f"data:{file.content_type};base64,{base64_image}"},
+                    {"image": f"data:{content_type};base64,{base64_image}"},
                     {"text": f"""Analyze this coastal waste photo. 
                     Return ONLY a JSON object with these exact fields:
                     1. "primary_waste": (string) Choose from: {', '.join(TAXONOMY_CATEGORIES)}
@@ -518,14 +587,14 @@ async def detect_waste(
                     8. "bounding_boxes": (array) Each with: "ymin" (in 0-1000 scale with height=1000), "xmin" (in 0-1000 scale with width=1000), "ymax" (in 0-1000 scale with height=1000), "xmax" (in 0-1000 scale with width=1000), "label"
                     """}
                 ]
-            }]
+        }]
         
-            response = MultiModalConversation.call(
-                model='qwen-vl-plus',
-                messages=messages
-            )
+        response = MultiModalConversation.call(
+            model='qwen-vl-plus',
+            messages=messages
+        )
 
-            if response.status_code == 200:
+        if response.status_code == 200:
                 content_list = response.output.choices[0].message.content
                 result_text = ""
                 for item in content_list:
@@ -549,7 +618,7 @@ async def detect_waste(
             
                 boxes_data = qwen_result.get("bounding_boxes", [])
                 boxes = []
-                for i, box in enumerate(boxes_data):
+                for box in boxes_data:
                     boxes.append(BoundingBox(
                         ymin=box.get("ymin", random.randint(100, 800)),
                         xmin=box.get("xmin", random.randint(100, 800)),
@@ -584,8 +653,8 @@ async def detect_waste(
                     imageUrl=final_image_url, 
                     timestamp=datetime.now().isoformat()
                 )
-            else:
-                raise Exception(f"Qwen API error: {response.code}")
+        else:
+            raise Exception(f"Qwen API error: {response.code}")
         
     except Exception as e:
         print(f"Qwen API failed, falling back to mock: {e}")
@@ -616,13 +685,20 @@ async def detect_waste(
 @app.post("/api/reports")
 async def save_final_report(report_data: dict, user=Depends(require_auth)):
     """Saves the final, user-edited report to Supabase."""
+    report_id = report_data.get("id")
+    if report_id:
+        existing = supabase.table("reports").select("user_id").eq("id", report_id).limit(1).execute()
+        if existing.data:
+            owner_id = existing.data[0].get("user_id")
+            if owner_id and owner_id != str(user.id):
+                raise HTTPException(status_code=403, detail="You can only update your own reports")
+
     report_data["user_id"] = str(user.id)
     
     success = save_report_to_supabase(report_data)
     if success:
         return {"status": "success", "message": "Report saved to Supabase"}
-    else:
-        return {"status": "error", "message": "Failed to save report"}
+    raise HTTPException(status_code=500, detail="Failed to save report")
 
 # --- DELETE REPORT ---
 @app.delete("/api/reports/{report_id}")
