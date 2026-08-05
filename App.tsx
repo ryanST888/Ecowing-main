@@ -1,11 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { LayoutDashboard, Map as MapIcon, Upload, Menu, X, Home as HomeIcon, Mail, Lock, User, Loader2, Moon, Sun } from 'lucide-react';
 import { AuthUser, GeminiAnalysisResult, Language, WasteDataPoint, Severity } from './types';
 import { TRANSLATIONS } from './constants';
 import Home from './components/H2';
 import type { SiteDetailsData } from './components/SiteDetailsModal';
-import { clearStoredAuth, deleteReport, getCurrentUser, getHistory, getStoredAuth, login, setStoredAuth, signUp } from './services/apiService';
+import { clearStoredAuth, deleteReport, getCurrentUser, getHistory, getStoredAuth, googleLogin, login, logout, setStoredAuth, signUp } from './services/apiService';
 
 const Dashboard = lazy(() => import('./components/Db2'));
 const CoastalMap = lazy(() => import('./components/CM2'));
@@ -57,6 +58,7 @@ const App = () => {
   const [authUsername, setAuthUsername] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const isLoggedIn = Boolean(authUser);
+  const googleClientConfigured = Boolean((import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim());
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -218,7 +220,7 @@ const App = () => {
       if (authMode === 'signup') {
         const auth = await signUp(authEmail.trim(), authPassword, authUsername.trim());
         if (!auth) {
-          setAuthMessage(lang === Language.EN ? 'Account created. Please check your email to confirm before logging in.' : '帳戶已建立，請先到電郵確認後再登入。');
+          setAuthMessage(lang === Language.EN ? 'Account created. You can log in now.' : '帳戶已建立，現在可以登入。');
           setAuthMode('login');
           return;
         }
@@ -239,8 +241,29 @@ const App = () => {
     }
   };
 
-  const handleLogout = () => {
-    clearStoredAuth();
+  const handleGoogleSuccess = async (response: CredentialResponse) => {
+    if (!response.credential) {
+      setLoginError(lang === Language.EN ? 'Google did not return a login credential.' : 'Google 未能提供登入憑證。');
+      return;
+    }
+
+    setLoginError('');
+    setAuthMessage('');
+    setAuthLoading(true);
+    try {
+      const auth = await googleLogin(response.credential);
+      setAuthUser(auth.user);
+      setShowLogin(false);
+      setAuthPassword('');
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : (lang === Language.EN ? 'Google login failed.' : 'Google 登入失敗。'));
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
     setAuthUser(null);
     setActiveTab('home');
     alert(lang === Language.EN ? 'Logged out' : '已登出');
@@ -311,8 +334,8 @@ const App = () => {
         </h2>
         <p className="text-slate-400 text-sm mb-6">
           {lang === Language.EN
-            ? 'Use your email account to upload and manage reports.'
-            : '使用電郵帳戶上傳和管理報告。'}
+            ? 'Use Google or email to upload and manage reports.'
+            : '使用 Google 或電郵帳戶上傳和管理報告。'}
         </p>
 
         <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-900 p-1 border border-slate-700 mb-5">
@@ -337,6 +360,30 @@ const App = () => {
         </div>
 
         <div className="space-y-4">
+          {googleClientConfigured && (
+            <>
+              <div className={`google-login-shell flex min-h-11 w-full justify-center overflow-hidden rounded-lg ${authLoading ? 'pointer-events-none opacity-60' : ''}`}>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setLoginError(lang === Language.EN ? 'Google login was cancelled or failed.' : 'Google 登入已取消或失敗。')}
+                  theme={theme === 'dark' ? 'filled_black' : 'outline'}
+                  size="large"
+                  shape="rectangular"
+                  text={authMode === 'signup' ? 'signup_with' : 'signin_with'}
+                  width="336"
+                  locale={lang === Language.EN ? 'en' : 'zh_TW'}
+                />
+              </div>
+              <div className="flex items-center gap-3" aria-hidden="true">
+                <div className="h-px flex-1 bg-slate-700" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  {lang === Language.EN ? 'or use email' : '或使用電郵'}
+                </span>
+                <div className="h-px flex-1 bg-slate-700" />
+              </div>
+            </>
+          )}
+
           {authMode === 'signup' && (
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">

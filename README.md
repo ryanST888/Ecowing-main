@@ -1,12 +1,13 @@
 # EcoWing
 
-EcoWing is a React and FastAPI coastal-waste reporting system with image analysis, report history, interactive mapping, authentication, and Supabase persistence.
+EcoWing is a React and FastAPI coastal-waste reporting system with image analysis, report history, interactive mapping, Supabase authentication/database persistence, and Azure Blob media storage.
 
 ## Prerequisites
 
 - Node.js 20+
 - Python 3.10+
 - Supabase project credentials
+- Azure Storage account and Blob container
 - Qwen API key for image analysis
 
 ## Setup
@@ -22,7 +23,7 @@ Activate the Python environment, then install the backend dependencies:
 pip install -r backend/requirements.txt
 ```
 
-Copy `.env.example` to `.env` and `backend/.env.example` to `backend/.env`. Add the backend API, Supabase, and allowed-origin values to `backend/.env`.
+Copy `.env.example` to `.env` and `backend/.env.example` to `backend/.env`. Add the backend API, Supabase, Azure Storage, and allowed-origin values to `backend/.env`. Azure Storage uses managed identity or service-principal credentials by default; connection strings only work when shared-key access is enabled on the storage account.
 
 ## Run locally
 

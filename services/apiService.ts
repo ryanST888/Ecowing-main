@@ -3,6 +3,7 @@ import { AuthSession, AuthUser, DetectionResult, Severity, WasteDataPoint } from
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const apiUrl = (path: string) => `${API_BASE_URL}${path}`;
 const AUTH_STORAGE_KEY = 'ecoWingAuth';
+let refreshPromise: Promise<StoredAuth> | null = null;
 
 export interface StoredAuth {
     user: AuthUser;
@@ -29,6 +30,76 @@ export const clearStoredAuth = () => {
 export const getAuthHeaders = (): HeadersInit => {
     const token = getStoredAuth()?.session?.access_token;
     return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const getTokenExpiry = (token: string): number | null => {
+    try {
+        const payload = token.split('.')[1];
+        const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+        const claims = JSON.parse(atob(padded)) as { exp?: number };
+        return claims.exp ? claims.exp * 1000 : null;
+    } catch {
+        return null;
+    }
+};
+
+const refreshStoredAuth = async (): Promise<StoredAuth> => {
+    if (refreshPromise) return refreshPromise;
+
+    const stored = getStoredAuth();
+    if (!stored?.session?.refresh_token) {
+        clearStoredAuth();
+        throw new Error('Session expired');
+    }
+
+    refreshPromise = (async () => {
+        const response = await fetch(apiUrl('/api/auth/refresh'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: stored.session.refresh_token }),
+        });
+
+        if (!response.ok) {
+            clearStoredAuth();
+            throw new Error(await readErrorMessage(response, 'Session expired'));
+        }
+
+        const data = await response.json();
+        const auth = {
+            user: data.user as AuthUser,
+            session: data.session as AuthSession,
+        };
+        setStoredAuth(auth);
+        return auth;
+    })();
+
+    try {
+        return await refreshPromise;
+    } finally {
+        refreshPromise = null;
+    }
+};
+
+export const authenticatedFetch = async (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
+    let stored = getStoredAuth();
+    const expiresAt = stored?.session?.access_token ? getTokenExpiry(stored.session.access_token) : null;
+    if (stored?.session?.refresh_token && expiresAt && expiresAt <= Date.now() + 30_000) {
+        stored = await refreshStoredAuth();
+    }
+
+    const headers = new Headers(init.headers);
+    if (stored?.session?.access_token) {
+        headers.set('Authorization', `Bearer ${stored.session.access_token}`);
+    }
+
+    let response = await fetch(input, { ...init, headers });
+    if (response.status === 401 && stored?.session?.refresh_token) {
+        const refreshed = await refreshStoredAuth();
+        headers.set('Authorization', `Bearer ${refreshed.session.access_token}`);
+        response = await fetch(input, { ...init, headers });
+    }
+    return response;
 };
 
 const readErrorMessage = async (response: Response, fallback: string) => {
@@ -84,10 +155,43 @@ export const login = async (email: string, password: string): Promise<StoredAuth
     return auth;
 };
 
-export const getCurrentUser = async (): Promise<AuthUser> => {
-    const response = await fetch(apiUrl('/api/auth/me'), {
-        headers: getAuthHeaders(),
+export const googleLogin = async (credential: string): Promise<StoredAuth> => {
+    const response = await fetch(apiUrl('/api/auth/google'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential }),
     });
+
+    if (!response.ok) {
+        throw new Error(await readErrorMessage(response, 'Google login failed'));
+    }
+
+    const data = await response.json();
+    const auth = {
+        user: data.user as AuthUser,
+        session: data.session as AuthSession,
+    };
+    setStoredAuth(auth);
+    return auth;
+};
+
+export const logout = async (): Promise<void> => {
+    const refreshToken = getStoredAuth()?.session?.refresh_token;
+    try {
+        if (refreshToken) {
+            await fetch(apiUrl('/api/auth/logout'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            });
+        }
+    } finally {
+        clearStoredAuth();
+    }
+};
+
+export const getCurrentUser = async (): Promise<AuthUser> => {
+    const response = await authenticatedFetch(apiUrl('/api/auth/me'));
 
     if (!response.ok) {
         throw new Error(await readErrorMessage(response, 'Session expired'));
@@ -113,9 +217,8 @@ export const detectWaste = async (
         formData.append('locationName', locationName);
     }
 
-    const response = await fetch(apiUrl('/api/detect'), {
+    const response = await authenticatedFetch(apiUrl('/api/detect'), {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: formData,
     });
 
@@ -167,9 +270,8 @@ export const getHistory = async (): Promise<WasteDataPoint[]> => {
 };
 
 export const deleteReport = async (id: string): Promise<void> => {
-    const response = await fetch(apiUrl(`/api/reports/${encodeURIComponent(id)}`), {
+    const response = await authenticatedFetch(apiUrl(`/api/reports/${encodeURIComponent(id)}`), {
         method: 'DELETE',
-        headers: getAuthHeaders(),
     });
 
     if (!response.ok) {

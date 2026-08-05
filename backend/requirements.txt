@@ -6,6 +6,16 @@ python-multipart>=0.0.6
 # Supabase
 supabase>=2.0.0
 
+# Azure Blob Storage
+azure-storage-blob>=12.22.0
+azure-identity>=1.17.1
+azure-cosmos>=4.7.0
+
+# Authentication
+argon2-cffi>=23.1.0
+email-validator>=2.1.0
+google-auth>=2.35.0
+
 # Qwen AI API
 dashscope>=1.14.0
 

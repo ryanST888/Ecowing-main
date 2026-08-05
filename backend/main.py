@@ -7,13 +7,16 @@ from fastapi import FastAPI, UploadFile, File, Form, Request, HTTPException, Dep
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
-from datetime import datetime
+from pydantic import BaseModel, EmailStr
+from datetime import datetime, timezone, timedelta
 from PIL import Image, UnidentifiedImageError
 import io
 import os
 import requests
 import base64
+import hashlib
+import hmac
+from urllib.parse import quote, unquote
 
 # For Qwen API
 import dashscope
@@ -21,6 +24,19 @@ from dashscope import MultiModalConversation
 
 # Supabase
 from supabase import create_client, Client
+
+# Azure Blob Storage
+from azure.storage.blob import BlobServiceClient, ContentSettings
+from azure.identity import DefaultAzureCredential
+from azure.cosmos import CosmosClient, exceptions as cosmos_exceptions
+
+# Application authentication
+import jwt
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError, VerificationError
+from google.auth.transport import requests as google_auth_requests
+from google.auth.exceptions import GoogleAuthError
+from google.oauth2 import id_token as google_id_token
 
 import pathlib
 from dotenv import load_dotenv
@@ -36,6 +52,89 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY) if SUPABASE_URL and SUPABASE_SERVICE_KEY else None
+
+# --- Azure Identity ---
+azure_credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
+
+# --- Media Storage Client ---
+STORAGE_PROVIDER = os.getenv("STORAGE_PROVIDER", "azure").strip().lower()
+AZURE_STORAGE_AUTH_MODE = os.getenv("AZURE_STORAGE_AUTH_MODE", "auto").strip().lower()
+AZURE_STORAGE_ACCOUNT_URL = os.getenv("AZURE_STORAGE_ACCOUNT_URL", "").strip().rstrip("/")
+AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING", "").strip()
+AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "report-images").strip()
+AZURE_STORAGE_PUBLIC_URL = os.getenv("AZURE_STORAGE_PUBLIC_URL", "").strip().rstrip("/")
+
+azure_blob_service = None
+azure_container = None
+azure_storage_auth = "not configured"
+if STORAGE_PROVIDER == "azure" and AZURE_STORAGE_CONTAINER:
+    try:
+        if AZURE_STORAGE_ACCOUNT_URL and AZURE_STORAGE_AUTH_MODE in {"auto", "default_credential"}:
+            azure_blob_service = BlobServiceClient(
+                account_url=AZURE_STORAGE_ACCOUNT_URL,
+                credential=azure_credential,
+            )
+            azure_storage_auth = "default_credential"
+        elif AZURE_STORAGE_CONNECTION_STRING and AZURE_STORAGE_AUTH_MODE in {"auto", "connection_string"}:
+            azure_blob_service = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+            azure_storage_auth = "connection_string"
+        elif AZURE_STORAGE_AUTH_MODE not in {"auto", "default_credential", "connection_string"}:
+            raise ValueError(f"Unsupported AZURE_STORAGE_AUTH_MODE: {AZURE_STORAGE_AUTH_MODE}")
+
+        if azure_blob_service and not AZURE_STORAGE_PUBLIC_URL:
+            AZURE_STORAGE_PUBLIC_URL = f"{azure_blob_service.url.rstrip('/')}/{quote(AZURE_STORAGE_CONTAINER, safe='')}"
+
+        if not azure_blob_service:
+            raise ValueError(
+                "Azure Blob Storage requires AZURE_STORAGE_ACCOUNT_URL for default credentials "
+                "or AZURE_STORAGE_CONNECTION_STRING for account-key authentication"
+            )
+
+        azure_container = azure_blob_service.get_container_client(AZURE_STORAGE_CONTAINER)
+    except Exception as e:
+        print(f"Azure Blob Storage configuration error: {e}")
+
+# --- Azure Cosmos DB Client ---
+AZURE_COSMOS_ENDPOINT = os.getenv("AZURE_COSMOS_ENDPOINT", "").strip().rstrip("/")
+AZURE_COSMOS_DATABASE = os.getenv("AZURE_COSMOS_DATABASE", "ecowing").strip()
+AZURE_COSMOS_REPORTS_CONTAINER = os.getenv("AZURE_COSMOS_REPORTS_CONTAINER", "reports").strip()
+AZURE_COSMOS_PROFILES_CONTAINER = os.getenv("AZURE_COSMOS_PROFILES_CONTAINER", "profiles").strip()
+AZURE_COSMOS_IDENTITIES_CONTAINER = os.getenv("AZURE_COSMOS_IDENTITIES_CONTAINER", "auth-identities").strip()
+AZURE_COSMOS_SESSIONS_CONTAINER = os.getenv("AZURE_COSMOS_SESSIONS_CONTAINER", "auth-sessions").strip()
+
+cosmos_client = None
+cosmos_database = None
+cosmos_reports = None
+cosmos_profiles = None
+cosmos_identities = None
+cosmos_sessions = None
+if AZURE_COSMOS_ENDPOINT and AZURE_COSMOS_DATABASE:
+    try:
+        cosmos_client = CosmosClient(AZURE_COSMOS_ENDPOINT, credential=azure_credential)
+        cosmos_database = cosmos_client.get_database_client(AZURE_COSMOS_DATABASE)
+        cosmos_reports = cosmos_database.get_container_client(AZURE_COSMOS_REPORTS_CONTAINER)
+        cosmos_profiles = cosmos_database.get_container_client(AZURE_COSMOS_PROFILES_CONTAINER)
+        cosmos_identities = cosmos_database.get_container_client(AZURE_COSMOS_IDENTITIES_CONTAINER)
+        cosmos_sessions = cosmos_database.get_container_client(AZURE_COSMOS_SESSIONS_CONTAINER)
+    except Exception as e:
+        print(f"Azure Cosmos DB configuration error: {e}")
+
+# --- Application Authentication Configuration ---
+AUTH_JWT_SECRET = os.getenv("AUTH_JWT_SECRET", "").strip()
+AUTH_JWT_ISSUER = os.getenv("AUTH_JWT_ISSUER", "ecowing-api").strip()
+AUTH_JWT_AUDIENCE = os.getenv("AUTH_JWT_AUDIENCE", "ecowing-web").strip()
+AUTH_ACCESS_TOKEN_MINUTES = int(os.getenv("AUTH_ACCESS_TOKEN_MINUTES", "15"))
+AUTH_REFRESH_TOKEN_DAYS = int(os.getenv("AUTH_REFRESH_TOKEN_DAYS", "30"))
+AUTH_JWT_ALGORITHM = "HS256"
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+
+password_hasher = PasswordHasher(
+    time_cost=3,
+    memory_cost=65536,
+    parallelism=4,
+    hash_len=32,
+    salt_len=16,
+)
 
 # Security scheme for JWT auth
 security = HTTPBearer(auto_error=False)
@@ -100,41 +199,157 @@ TAXONOMY: Dict[str, List[str]] = {
 }
 
 # --- Auth Helpers ---
+class AuthenticatedUser(BaseModel):
+    id: str
+    email: str
+    username: str
+
+
+def auth_is_configured() -> bool:
+    return all((AUTH_JWT_SECRET, cosmos_profiles, cosmos_identities, cosmos_sessions))
+
+
+def normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+
+def get_identity(login_key: str) -> Optional[dict]:
+    if cosmos_identities is None:
+        return None
+
+
+def add_profile_provider(profile: dict, provider: str) -> dict:
+    providers = [str(item) for item in profile.get("providers", []) if item]
+    if provider not in providers:
+        providers.append(provider)
+    profile["providers"] = providers
+    profile["updated_at"] = utc_now_iso()
+    return profile
+
+
+def verify_google_credential(credential: str) -> dict:
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=500, detail="Google authentication is not configured")
+    if not credential.strip():
+        raise HTTPException(status_code=400, detail="Google credential is required")
+    try:
+        claims = google_id_token.verify_oauth2_token(
+            credential,
+            google_auth_requests.Request(),
+            GOOGLE_CLIENT_ID,
+        )
+    except (ValueError, TypeError, GoogleAuthError):
+        raise HTTPException(status_code=401, detail="Invalid Google credential")
+
+    issuer = str(claims.get("iss") or "")
+    if issuer not in {"accounts.google.com", "https://accounts.google.com"}:
+        raise HTTPException(status_code=401, detail="Invalid Google credential issuer")
+    if not claims.get("email_verified"):
+        raise HTTPException(status_code=401, detail="Google email is not verified")
+    if not claims.get("sub") or not claims.get("email"):
+        raise HTTPException(status_code=401, detail="Google account information is incomplete")
+    return claims
+    try:
+        return cosmos_identities.read_item(item=login_key, partition_key=login_key)
+    except cosmos_exceptions.CosmosResourceNotFoundError:
+        return None
+
+
+def refresh_token_hash(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def decode_auth_token(token: str, expected_type: str) -> dict:
+    if not AUTH_JWT_SECRET:
+        raise HTTPException(status_code=500, detail="Application authentication is not configured")
+    try:
+        claims = jwt.decode(
+            token,
+            AUTH_JWT_SECRET,
+            algorithms=[AUTH_JWT_ALGORITHM],
+            audience=AUTH_JWT_AUDIENCE,
+            issuer=AUTH_JWT_ISSUER,
+            options={"require": ["exp", "iat", "iss", "aud", "sub", "type"]},
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Session expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    if claims.get("type") != expected_type:
+        raise HTTPException(status_code=401, detail="Invalid token type")
+    return claims
+
+
+def authenticated_user_from_claims(claims: dict) -> AuthenticatedUser:
+    return AuthenticatedUser(
+        id=str(claims.get("sub")),
+        email=str(claims.get("email") or ""),
+        username=str(claims.get("username") or "User"),
+    )
+
+
+def issue_auth_session(user: AuthenticatedUser, session_id: Optional[str] = None) -> dict:
+    if cosmos_sessions is None or not AUTH_JWT_SECRET:
+        raise HTTPException(status_code=500, detail="Application authentication is not configured")
+
+    now = datetime.now(timezone.utc)
+    session_id = session_id or uuid.uuid4().hex
+    access_expires = now + timedelta(minutes=AUTH_ACCESS_TOKEN_MINUTES)
+    refresh_expires = now + timedelta(days=AUTH_REFRESH_TOKEN_DAYS)
+    shared_claims = {
+        "sub": user.id,
+        "email": user.email,
+        "username": user.username,
+        "sid": session_id,
+        "iss": AUTH_JWT_ISSUER,
+        "aud": AUTH_JWT_AUDIENCE,
+        "iat": now,
+    }
+    access_token = jwt.encode(
+        {**shared_claims, "type": "access", "exp": access_expires},
+        AUTH_JWT_SECRET,
+        algorithm=AUTH_JWT_ALGORITHM,
+    )
+    refresh_token = jwt.encode(
+        {**shared_claims, "type": "refresh", "exp": refresh_expires},
+        AUTH_JWT_SECRET,
+        algorithm=AUTH_JWT_ALGORITHM,
+    )
+    cosmos_sessions.upsert_item({
+        "id": session_id,
+        "user_id": user.id,
+        "refresh_token_hash": refresh_token_hash(refresh_token),
+        "created_at": now.isoformat(),
+        "expires_at": refresh_expires.isoformat(),
+        "revoked": False,
+    })
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_in": AUTH_ACCESS_TOKEN_MINUTES * 60,
+    }
+
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Extract user from JWT token. Returns None if no token provided."""
-    if not credentials or not supabase:
+    """Return the authenticated user, or None when no valid access token is present."""
+    if not credentials:
         return None
     try:
-        token = credentials.credentials
-        # Verify the token using Supabase
-        user_response = supabase.auth.get_user(token)
-        if user_response and user_response.user:
-            return user_response.user
+        return authenticated_user_from_claims(decode_auth_token(credentials.credentials, "access"))
+    except HTTPException:
         return None
-    except Exception as e:
-        print(f"Auth error: {e}")
-        return None
+
 
 async def require_auth(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Require authentication. Raises 401 if not authenticated."""
+    """Require a valid EcoWing access token."""
     if not credentials:
         raise HTTPException(status_code=401, detail="Authentication required")
-    if not supabase:
-        raise HTTPException(status_code=500, detail="Supabase not configured")
-    try:
-        token = credentials.credentials
-        user_response = supabase.auth.get_user(token)
-        if user_response and user_response.user:
-            return user_response.user
-        raise HTTPException(status_code=401, detail="Invalid token")
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
+    return authenticated_user_from_claims(decode_auth_token(credentials.credentials, "access"))
 
-# --- Supabase Storage Helper ---
+# --- Media Storage Helpers ---
 def upload_image_to_supabase(file_bytes: bytes, filename: str, content_type: str, user_id: str = "anonymous") -> str:
-    """Upload an image to Supabase Storage and return the public URL."""
+    """Legacy Supabase Storage upload helper."""
     if not supabase:
         return ""
     try:
@@ -154,6 +369,58 @@ def upload_image_to_supabase(file_bytes: bytes, filename: str, content_type: str
     except Exception as e:
         print(f"Supabase Storage upload error: {e}")
         return ""
+
+
+def upload_media_to_azure(file_bytes: bytes, filename: str, content_type: str, user_id: str = "anonymous") -> str:
+    """Upload media to Azure Blob Storage and return its public URL."""
+    if not azure_container or not AZURE_STORAGE_PUBLIC_URL:
+        return ""
+
+    storage_path = f"{user_id}/{filename}"
+
+    try:
+        blob_client = azure_container.get_blob_client(storage_path)
+        blob_client.upload_blob(
+            file_bytes,
+            overwrite=False,
+            content_settings=ContentSettings(
+                content_type=content_type,
+                cache_control="public, max-age=31536000",
+            ),
+        )
+        return f"{AZURE_STORAGE_PUBLIC_URL}/{quote(storage_path, safe='/')}"
+    except Exception as e:
+        print(f"Azure Blob Storage upload error: {e}")
+        return ""
+
+
+def upload_media_to_storage(file_bytes: bytes, filename: str, content_type: str, user_id: str = "anonymous") -> str:
+    """Upload media using the configured storage provider."""
+    if STORAGE_PROVIDER == "azure":
+        return upload_media_to_azure(file_bytes, filename, content_type, user_id)
+    if STORAGE_PROVIDER == "supabase":
+        return upload_image_to_supabase(file_bytes, filename, content_type, user_id)
+
+    print(f"Unsupported storage provider: {STORAGE_PROVIDER}")
+    return ""
+
+
+def delete_media_from_storage(image_url: str) -> None:
+    """Delete media from Azure, while retaining support for legacy Supabase URLs."""
+    azure_prefix = f"{AZURE_STORAGE_PUBLIC_URL}/" if AZURE_STORAGE_PUBLIC_URL else ""
+
+    if azure_container and azure_prefix and image_url.startswith(azure_prefix):
+        storage_path = unquote(image_url[len(azure_prefix):].split("?", 1)[0])
+        azure_container.get_blob_client(storage_path).delete_blob(delete_snapshots="include")
+        print(f"Deleted image from Azure Blob Storage: {storage_path}")
+        return
+
+    supabase_marker = "/storage/v1/object/public/report-images/"
+    if supabase and supabase_marker in image_url:
+        storage_path = unquote(image_url.split(supabase_marker, 1)[1].split("?", 1)[0])
+        supabase.storage.from_("report-images").remove([storage_path])
+        print(f"Deleted image from Supabase Storage: {storage_path}")
+
 
 def validate_upload(file_bytes: bytes, declared_content_type: str) -> tuple[str, str, bool]:
     """Validate uploaded media and return its canonical MIME type, extension, and video flag."""
@@ -203,7 +470,7 @@ def validate_upload(file_bytes: bytes, declared_content_type: str) -> tuple[str,
 
 def persist_upload(file_bytes: bytes, extension: str, content_type: str, request: Request, user_id: str) -> str:
     filename = f"{uuid.uuid4().hex}{extension}"
-    public_url = upload_image_to_supabase(file_bytes, filename, content_type, user_id)
+    public_url = upload_media_to_storage(file_bytes, filename, content_type, user_id)
     if public_url:
         return public_url
 
@@ -212,16 +479,46 @@ def persist_upload(file_bytes: bytes, extension: str, content_type: str, request
         local_file.write(file_bytes)
     return f"{get_public_base_url(request)}/uploads/{filename}"
 
-# --- Supabase Data Helpers ---
-def save_report_to_supabase(report_data: dict) -> bool:
-    """Save a report to Supabase reports table."""
-    if not supabase:
-        return False
+# --- Azure Cosmos DB Data Helpers ---
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def get_report_document(report_id: str) -> Optional[dict]:
+    """Find a report by ID across user partitions."""
+    if cosmos_reports is None:
+        raise RuntimeError("Azure Cosmos DB reports container is not configured")
+
+    query = "SELECT TOP 1 * FROM c WHERE c.id = @report_id"
+    parameters = [{"name": "@report_id", "value": report_id}]
+    items = list(cosmos_reports.query_items(
+        query=query,
+        parameters=parameters,
+        enable_cross_partition_query=True,
+    ))
+    return items[0] if items else None
+
+
+def get_profile_document(user_id: str) -> Optional[dict]:
+    """Read a profile using its ID as both item ID and partition key."""
+    if cosmos_profiles is None:
+        return None
     try:
-        # Map frontend field names to database column names
+        return cosmos_profiles.read_item(item=user_id, partition_key=user_id)
+    except cosmos_exceptions.CosmosResourceNotFoundError:
+        return None
+
+
+def save_report_to_cosmos(report_data: dict, existing: Optional[dict] = None) -> bool:
+    """Create or update a report in Azure Cosmos DB."""
+    if cosmos_reports is None:
+        return False
+
+    try:
+        now = utc_now_iso()
         db_record = {
-            "id": report_data.get("id", f"RPT-{int(time.time() * 1000)}"),
-            "user_id": report_data.get("user_id"),
+            "id": str(report_data.get("id") or f"RPT-{int(time.time() * 1000)}"),
+            "user_id": str(report_data.get("user_id") or ""),
             "category": report_data.get("category", "Other"),
             "sub_category": report_data.get("subCategory"),
             "severity": report_data.get("severity", "MEDIUM"),
@@ -239,72 +536,73 @@ def save_report_to_supabase(report_data: dict) -> bool:
             "verified": report_data.get("verified", True),
             "message": report_data.get("message", ""),
             "status": report_data.get("status", "pending"),
+            "created_at": (existing or {}).get("created_at") or report_data.get("timestamp") or now,
+            "updated_at": now,
         }
-        
-        # Remove None values so defaults kick in
-        db_record = {k: v for k, v in db_record.items() if v is not None}
-        
-        supabase.table("reports").upsert(db_record).execute()
+        db_record = {key: value for key, value in db_record.items() if value is not None}
+
+        if not db_record["user_id"]:
+            raise ValueError("A report must have a user_id partition key")
+
+        cosmos_reports.upsert_item(db_record)
         return True
     except Exception as e:
-        print(f"Supabase save error: {e}")
+        print(f"Azure Cosmos DB save error: {e}")
         return False
 
-def load_reports_from_supabase() -> list:
-    """Load all reports from Supabase, ordered by newest first."""
-    if not supabase:
-        return []
-    try:
-        response = supabase.table("reports").select("*").order("created_at", desc=True).execute()
-        user_ids = [
-            str(row.get("user_id"))
-            for row in response.data
-            if row.get("user_id")
-        ]
-        profile_map = {}
 
-        if user_ids:
-            try:
-                profile_response = supabase.table("profiles").select("id, username").in_("id", user_ids).execute()
-                profile_map = {
-                    str(profile.get("id")): profile.get("username", "User")
-                    for profile in profile_response.data
-                }
-            except Exception as profile_err:
-                print(f"Supabase profile load warning: {profile_err}")
-        
-        # Map database column names back to frontend field names
-        reports = []
-        for row in response.data:
-            user_id = row.get("user_id")
-            report = {
-                "id": row.get("id"),
-                "category": row.get("category"),
-                "subCategory": row.get("sub_category"),
-                "severity": row.get("severity"),
-                "description": row.get("description"),
-                "estimatedWeightKg": float(row.get("estimated_weight_kg") or 0),
-                "cleanupPriority": row.get("cleanup_priority"),
-                "wasteType": row.get("waste_type", []),
-                "waste_distribution": row.get("waste_distribution", {}),
-                "boundingBoxes": row.get("bounding_boxes", []),
-                "unique_item_count": row.get("unique_item_count"),
-                "imageUrl": row.get("image_url"),
-                "latitude": float(row.get("latitude", 0)) if row.get("latitude") else None,
-                "longitude": float(row.get("longitude", 0)) if row.get("longitude") else None,
-                "locationName": row.get("location_name"),
-                "verified": row.get("verified"),
-                "message": row.get("message"),
-                "status": row.get("status"),
-                "timestamp": row.get("created_at"),
-                "user_id": user_id,
-                "username": profile_map.get(str(user_id), "Anonymous") if user_id else "Anonymous",
-            }
-            reports.append(report)
-        
-        return reports
+def report_document_to_api(row: dict, username: str = "Anonymous") -> dict:
+    """Map a Cosmos DB report document to the existing frontend API shape."""
+    return {
+        "id": row.get("id"),
+        "category": row.get("category"),
+        "subCategory": row.get("sub_category"),
+        "severity": row.get("severity"),
+        "description": row.get("description"),
+        "estimatedWeightKg": float(row.get("estimated_weight_kg") or 0),
+        "cleanupPriority": row.get("cleanup_priority"),
+        "wasteType": row.get("waste_type", []),
+        "waste_distribution": row.get("waste_distribution", {}),
+        "boundingBoxes": row.get("bounding_boxes", []),
+        "unique_item_count": row.get("unique_item_count"),
+        "imageUrl": row.get("image_url"),
+        "latitude": float(row.get("latitude", 0)) if row.get("latitude") is not None else None,
+        "longitude": float(row.get("longitude", 0)) if row.get("longitude") is not None else None,
+        "locationName": row.get("location_name"),
+        "verified": row.get("verified"),
+        "message": row.get("message"),
+        "status": row.get("status"),
+        "timestamp": row.get("created_at"),
+        "user_id": row.get("user_id"),
+        "username": username,
+    }
+
+
+def load_reports_from_cosmos() -> list:
+    """Load all reports from Azure Cosmos DB, newest first."""
+    if cosmos_reports is None:
+        return []
+
+    try:
+        rows = list(cosmos_reports.query_items(
+            query="SELECT * FROM c ORDER BY c.created_at DESC",
+            enable_cross_partition_query=True,
+        ))
+        profile_map = {}
+        for user_id in {str(row.get("user_id")) for row in rows if row.get("user_id")}:
+            profile = get_profile_document(user_id)
+            if profile:
+                profile_map[user_id] = profile.get("username") or profile.get("display_name") or "User"
+
+        return [
+            report_document_to_api(
+                row,
+                profile_map.get(str(row.get("user_id")), "Anonymous") if row.get("user_id") else "Anonymous",
+            )
+            for row in rows
+        ]
     except Exception as e:
-        print(f"Supabase load error: {e}")
+        print(f"Azure Cosmos DB load error: {e}")
         return []
 
 # --- Models ---
@@ -330,148 +628,327 @@ class DetectionResult(BaseModel):
     imageUrl: Optional[str] = None
 
 class SignUpRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
     username: Optional[str] = "User"
 
 class LoginRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+class GoogleLoginRequest(BaseModel):
+    credential: str
 
 # --- Auth Endpoints ---
 @app.post("/api/auth/signup")
 async def sign_up(req: SignUpRequest):
-    """Register a new user via Supabase Auth."""
-    if not supabase:
-        raise HTTPException(status_code=500, detail="Supabase not configured")
-    try:
-        response = supabase.auth.sign_up({
-            "email": req.email,
-            "password": req.password,
-            "options": {
-                "data": {
-                    "username": req.username
-                }
-            }
-        })
-        
-        if response.user:
-            try:
-                supabase.table("profiles").upsert({
-                    "id": str(response.user.id),
-                    "username": req.username or "User",
-                }).execute()
-            except Exception as profile_err:
-                print(f"Supabase profile save warning: {profile_err}")
+    """Register a local email account in Azure Cosmos DB."""
+    if not auth_is_configured():
+        raise HTTPException(status_code=500, detail="Application authentication is not configured")
 
-            return {
-                "status": "success",
-                "message": "User registered successfully",
-                "user": {
-                    "id": str(response.user.id),
-                    "email": response.user.email,
-                    "username": req.username,
-                },
-                "session": {
-                    "access_token": response.session.access_token if response.session else None,
-                    "refresh_token": response.session.refresh_token if response.session else None,
-                } if response.session else None
-            }
-        else:
-            raise HTTPException(status_code=400, detail="Registration failed")
+    email = normalize_email(str(req.email))
+    username = (req.username or "").strip() or email.split("@", 1)[0]
+    if len(req.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    if len(req.password) > 256:
+        raise HTTPException(status_code=400, detail="Password is too long")
+
+    login_key = f"email:{email}"
+    if get_identity(login_key):
+        raise HTTPException(status_code=409, detail="An account with this email already exists")
+
+    user_id = uuid.uuid4().hex
+    now = utc_now_iso()
+    profile_created = False
+    try:
+        cosmos_profiles.create_item({
+            "id": user_id,
+            "email": email,
+            "username": username,
+            "avatar": "icon/default.png",
+            "providers": ["email"],
+            "created_at": now,
+            "updated_at": now,
+        })
+        profile_created = True
+        cosmos_identities.create_item({
+            "id": login_key,
+            "login_key": login_key,
+            "user_id": user_id,
+            "provider": "email",
+            "email": email,
+            "password_hash": password_hasher.hash(req.password),
+            "created_at": now,
+            "updated_at": now,
+        })
+
+        user = AuthenticatedUser(id=user_id, email=email, username=username)
+        return {
+            "status": "success",
+            "message": "User registered successfully",
+            "user": user.model_dump(),
+            "session": issue_auth_session(user),
+        }
+    except cosmos_exceptions.CosmosResourceExistsError:
+        if profile_created:
+            try:
+                cosmos_profiles.delete_item(item=user_id, partition_key=user_id)
+            except Exception:
+                pass
+        raise HTTPException(status_code=409, detail="An account with this email already exists")
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        if profile_created:
+            try:
+                cosmos_profiles.delete_item(item=user_id, partition_key=user_id)
+            except Exception:
+                pass
+        print(f"Registration error: {e}")
+        raise HTTPException(status_code=500, detail="Registration failed")
 
 @app.post("/api/auth/login")
 async def login(req: LoginRequest):
     """Log in with email and password."""
-    if not supabase:
-        raise HTTPException(status_code=500, detail="Supabase not configured")
-    try:
-        response = supabase.auth.sign_in_with_password({
-            "email": req.email,
-            "password": req.password,
-        })
-        
-        if response.user and response.session:
-            username = "User"
-            try:
-                profile_response = supabase.table("profiles").select("username").eq("id", str(response.user.id)).limit(1).execute()
-                if profile_response.data:
-                    username = profile_response.data[0].get("username") or username
-                else:
-                    metadata = getattr(response.user, "user_metadata", {}) or {}
-                    username = metadata.get("username") or username
-            except Exception as profile_err:
-                print(f"Supabase profile login warning: {profile_err}")
+    if not auth_is_configured():
+        raise HTTPException(status_code=500, detail="Application authentication is not configured")
 
-            return {
-                "status": "success",
-                "user": {
-                    "id": str(response.user.id),
-                    "email": response.user.email,
-                    "username": username,
-                },
-                "session": {
-                    "access_token": response.session.access_token,
-                    "refresh_token": response.session.refresh_token,
-                    "expires_in": response.session.expires_in,
-                }
-            }
+    email = normalize_email(str(req.email))
+    login_key = f"email:{email}"
+    identity = get_identity(login_key)
+    if not identity or identity.get("provider") != "email" or not identity.get("password_hash"):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    try:
+        password_hasher.verify(identity["password_hash"], req.password)
+    except (VerifyMismatchError, VerificationError):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    if password_hasher.check_needs_rehash(identity["password_hash"]):
+        identity["password_hash"] = password_hasher.hash(req.password)
+        identity["updated_at"] = utc_now_iso()
+        cosmos_identities.upsert_item(identity)
+
+    user_id = str(identity.get("user_id"))
+    profile = get_profile_document(user_id)
+    if not profile:
+        raise HTTPException(status_code=500, detail="User profile not found")
+
+    user = AuthenticatedUser(
+        id=user_id,
+        email=str(profile.get("email") or email),
+        username=str(profile.get("username") or "User"),
+    )
+    return {
+        "status": "success",
+        "user": user.model_dump(),
+        "session": issue_auth_session(user),
+    }
+
+
+@app.post("/api/auth/google")
+async def google_login(req: GoogleLoginRequest):
+    """Verify a Google ID token, create or link the user, and issue an EcoWing session."""
+    if not auth_is_configured():
+        raise HTTPException(status_code=500, detail="Application authentication is not configured")
+
+    claims = verify_google_credential(req.credential)
+    google_subject = str(claims["sub"])
+    email = normalize_email(str(claims["email"]))
+    google_login_key = f"google:{google_subject}"
+    email_login_key = f"email:{email}"
+    username = str(claims.get("name") or email.split("@", 1)[0]).strip() or "User"
+    avatar = str(claims.get("picture") or "icon/default.png").strip()
+    now = utc_now_iso()
+
+    google_identity = get_identity(google_login_key)
+    if google_identity:
+        user_id = str(google_identity.get("user_id") or "")
+        profile = get_profile_document(user_id)
+        if not profile:
+            raise HTTPException(status_code=500, detail="User profile not found")
+        profile = add_profile_provider(profile, "google")
+        if not profile.get("email"):
+            profile["email"] = email
+        cosmos_profiles.upsert_item(profile)
+    else:
+        email_identity = get_identity(email_login_key)
+        if email_identity:
+            user_id = str(email_identity.get("user_id") or "")
+            profile = get_profile_document(user_id)
+            if not profile:
+                raise HTTPException(status_code=500, detail="User profile not found")
+            profile = add_profile_provider(profile, "google")
+            if not profile.get("avatar") or profile.get("avatar") == "icon/default.png":
+                profile["avatar"] = avatar
+            cosmos_identities.create_item({
+                "id": google_login_key,
+                "login_key": google_login_key,
+                "user_id": user_id,
+                "provider": "google",
+                "email": email,
+                "google_sub": google_subject,
+                "created_at": now,
+                "updated_at": now,
+            })
+            cosmos_profiles.upsert_item(profile)
         else:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))
+            user_id = uuid.uuid4().hex
+            profile_created = False
+            email_marker_created = False
+            profile = {
+                "id": user_id,
+                "email": email,
+                "username": username,
+                "avatar": avatar,
+                "providers": ["google"],
+                "created_at": now,
+                "updated_at": now,
+            }
+            try:
+                cosmos_profiles.create_item(profile)
+                profile_created = True
+                cosmos_identities.create_item({
+                    "id": email_login_key,
+                    "login_key": email_login_key,
+                    "user_id": user_id,
+                    "provider": "google_email",
+                    "email": email,
+                    "created_at": now,
+                    "updated_at": now,
+                })
+                email_marker_created = True
+                cosmos_identities.create_item({
+                    "id": google_login_key,
+                    "login_key": google_login_key,
+                    "user_id": user_id,
+                    "provider": "google",
+                    "email": email,
+                    "google_sub": google_subject,
+                    "created_at": now,
+                    "updated_at": now,
+                })
+            except cosmos_exceptions.CosmosResourceExistsError:
+                if email_marker_created:
+                    try:
+                        cosmos_identities.delete_item(item=email_login_key, partition_key=email_login_key)
+                    except Exception:
+                        pass
+                if profile_created:
+                    try:
+                        cosmos_profiles.delete_item(item=user_id, partition_key=user_id)
+                    except Exception:
+                        pass
+                raise HTTPException(status_code=409, detail="Google account is already linked")
+            except Exception as e:
+                if email_marker_created:
+                    try:
+                        cosmos_identities.delete_item(item=email_login_key, partition_key=email_login_key)
+                    except Exception:
+                        pass
+                if profile_created:
+                    try:
+                        cosmos_profiles.delete_item(item=user_id, partition_key=user_id)
+                    except Exception:
+                        pass
+                print(f"Google registration error: {e}")
+                raise HTTPException(status_code=500, detail="Google login failed")
+
+    user = AuthenticatedUser(
+        id=user_id,
+        email=str(profile.get("email") or email),
+        username=str(profile.get("username") or username),
+    )
+    return {
+        "status": "success",
+        "user": user.model_dump(),
+        "session": issue_auth_session(user),
+    }
+
+
+@app.post("/api/auth/refresh")
+async def refresh_session(req: RefreshRequest):
+    """Rotate a refresh token and issue a new access token."""
+    if not auth_is_configured():
+        raise HTTPException(status_code=500, detail="Application authentication is not configured")
+
+    claims = decode_auth_token(req.refresh_token, "refresh")
+    user_id = str(claims.get("sub"))
+    session_id = str(claims.get("sid"))
+    try:
+        session = cosmos_sessions.read_item(item=session_id, partition_key=user_id)
+    except cosmos_exceptions.CosmosResourceNotFoundError:
+        raise HTTPException(status_code=401, detail="Session not found")
+
+    if session.get("revoked") or not hmac.compare_digest(
+        str(session.get("refresh_token_hash") or ""),
+        refresh_token_hash(req.refresh_token),
+    ):
+        raise HTTPException(status_code=401, detail="Session has been revoked")
+
+    profile = get_profile_document(user_id)
+    if not profile:
+        raise HTTPException(status_code=401, detail="User profile not found")
+    user = AuthenticatedUser(
+        id=user_id,
+        email=str(profile.get("email") or claims.get("email") or ""),
+        username=str(profile.get("username") or claims.get("username") or "User"),
+    )
+    return {
+        "user": user.model_dump(),
+        "session": issue_auth_session(user, session_id=session_id),
+    }
 
 @app.get("/api/auth/me")
 async def get_me(user=Depends(require_auth)):
     """Get current logged-in user info."""
-    try:
-        # Fetch profile from Supabase
-        profile_response = supabase.table("profiles").select("*").eq("id", str(user.id)).single().execute()
-        profile = profile_response.data if profile_response.data else {}
-        
-        return {
-            "id": str(user.id),
-            "email": user.email,
-            "username": profile.get("username", "User"),
-            "avatar": profile.get("avatar", "icon/default.png"),
-            "created_at": profile.get("created_at"),
-        }
-    except Exception as e:
-        metadata = getattr(user, "user_metadata", {}) or {}
-        return {
-            "id": str(user.id),
-            "email": user.email,
-            "username": metadata.get("username", "User"),
-        }
+    profile = get_profile_document(user.id) or {}
+    return {
+        "id": user.id,
+        "email": profile.get("email", user.email),
+        "username": profile.get("username", user.username),
+        "avatar": profile.get("avatar", "icon/default.png"),
+        "created_at": profile.get("created_at"),
+    }
 
 @app.post("/api/auth/logout")
-async def logout():
-    """Log out (client should discard token)."""
+async def logout(req: RefreshRequest):
+    """Revoke the current refresh-token session."""
+    if cosmos_sessions is not None and AUTH_JWT_SECRET:
+        try:
+            claims = decode_auth_token(req.refresh_token, "refresh")
+            cosmos_sessions.delete_item(
+                item=str(claims.get("sid")),
+                partition_key=str(claims.get("sub")),
+            )
+        except (HTTPException, cosmos_exceptions.CosmosResourceNotFoundError):
+            pass
     return {"status": "success", "message": "Logged out"}
 
 # --- Endpoints ---
 @app.get("/health")
 def health_check():
-    supabase_connected = supabase is not None
+    cosmos_configured = all((cosmos_reports, cosmos_profiles, cosmos_identities, cosmos_sessions))
+    media_storage_configured = azure_container is not None if STORAGE_PROVIDER == "azure" else False
     return {
         "status": "ok",
-        "supabase": "connected" if supabase_connected else "not configured"
+        "database_provider": "azure_cosmos",
+        "cosmos_db": "configured" if cosmos_configured else "not configured",
+        "auth_provider": "azure_cosmos_jwt",
+        "authentication": "configured" if auth_is_configured() else "not configured",
+        "google_login": "configured" if GOOGLE_CLIENT_ID else "not configured",
+        "storage_provider": STORAGE_PROVIDER,
+        "storage_auth": azure_storage_auth if STORAGE_PROVIDER == "azure" else "not configured",
+        "media_storage": "configured" if media_storage_configured else "not configured",
     }
 
 @app.get("/api/history")
 def get_history():
-    """Retrieve all saved reports from Supabase."""
-    reports = load_reports_from_supabase()
-    if reports:
-        return reports
-    # Fallback: if Supabase returns empty, it might just be empty
-    return reports
+    """Retrieve all saved reports from Azure Cosmos DB."""
+    return load_reports_from_cosmos()
 
 @app.get("/api/expand-url")
 def expand_url(url: str):
@@ -684,20 +1161,21 @@ async def detect_waste(
 # --- SAVE FINAL REPORT ---
 @app.post("/api/reports")
 async def save_final_report(report_data: dict, user=Depends(require_auth)):
-    """Saves the final, user-edited report to Supabase."""
+    """Save the final, user-edited report to Azure Cosmos DB."""
     report_id = report_data.get("id")
+    existing = None
     if report_id:
-        existing = supabase.table("reports").select("user_id").eq("id", report_id).limit(1).execute()
-        if existing.data:
-            owner_id = existing.data[0].get("user_id")
+        existing = get_report_document(report_id)
+        if existing:
+            owner_id = existing.get("user_id")
             if owner_id and owner_id != str(user.id):
                 raise HTTPException(status_code=403, detail="You can only update your own reports")
 
     report_data["user_id"] = str(user.id)
     
-    success = save_report_to_supabase(report_data)
+    success = save_report_to_cosmos(report_data, existing)
     if success:
-        return {"status": "success", "message": "Report saved to Supabase"}
+        return {"status": "success", "message": "Report saved to Azure Cosmos DB"}
     raise HTTPException(status_code=500, detail="Failed to save report")
 
 # --- DELETE REPORT ---
@@ -705,37 +1183,26 @@ async def save_final_report(report_data: dict, user=Depends(require_auth)):
 async def delete_report(report_id: str, user=Depends(require_auth)):
     """Delete a report. Users can delete their own reports; legacy unowned reports are removable by logged-in users."""
     try:
-        if not supabase:
-            raise HTTPException(status_code=500, detail="Supabase not configured")
+        if cosmos_reports is None:
+            raise HTTPException(status_code=500, detail="Azure Cosmos DB not configured")
 
-        # First check if the report belongs to a user.
-        report_response = supabase.table("reports").select("user_id, image_url").eq("id", report_id).limit(1).execute()
-        
-        if not report_response.data:
+        report = get_report_document(report_id)
+        if not report:
             raise HTTPException(status_code=404, detail="Report not found")
-
-        report = report_response.data[0]
         
         report_user_id = report.get("user_id")
         if report_user_id and report_user_id != str(user.id):
             raise HTTPException(status_code=403, detail="You can only delete your own reports")
         
-        # Try to delete the associated image from Supabase Storage
+        # Delete the associated image from its storage provider.
         image_url = report.get("image_url", "")
-        if image_url and "report-images" in image_url:
+        if image_url:
             try:
-                # Extract the path from the URL
-                # URL format: .../storage/v1/object/public/report-images/user_id/filename
-                path_match = image_url.split("report-images/")
-                if len(path_match) > 1:
-                    storage_path = path_match[1]
-                    supabase.storage.from_("report-images").remove([storage_path])
-                    print(f"Deleted image from storage: {storage_path}")
+                delete_media_from_storage(image_url)
             except Exception as img_err:
                 print(f"Warning: Could not delete image: {img_err}")
         
-        # Delete the report
-        supabase.table("reports").delete().eq("id", report_id).execute()
+        cosmos_reports.delete_item(item=report_id, partition_key=report_user_id)
         return {"status": "success", "message": "Report deleted"}
     except HTTPException:
         raise
@@ -747,43 +1214,17 @@ async def delete_report(report_id: str, user=Depends(require_auth)):
 async def get_report(report_id: str):
     """Get a single report by ID."""
     try:
-        response = supabase.table("reports").select("*").eq("id", report_id).single().execute()
-        if not response.data:
+        row = get_report_document(report_id)
+        if not row:
             raise HTTPException(status_code=404, detail="Report not found")
-        
-        row = response.data
+
         username = "Anonymous"
         if row.get("user_id"):
-            try:
-                profile_response = supabase.table("profiles").select("username").eq("id", str(row.get("user_id"))).limit(1).execute()
-                if profile_response.data:
-                    username = profile_response.data[0].get("username") or username
-            except Exception as profile_err:
-                print(f"Supabase profile load warning: {profile_err}")
+            profile = get_profile_document(str(row.get("user_id")))
+            if profile:
+                username = profile.get("username") or profile.get("display_name") or username
 
-        return {
-            "id": row.get("id"),
-            "category": row.get("category"),
-            "subCategory": row.get("sub_category"),
-            "severity": row.get("severity"),
-            "description": row.get("description"),
-            "estimatedWeightKg": float(row.get("estimated_weight_kg") or 0),
-            "cleanupPriority": row.get("cleanup_priority"),
-            "wasteType": row.get("waste_type", []),
-            "waste_distribution": row.get("waste_distribution", {}),
-            "boundingBoxes": row.get("bounding_boxes", []),
-            "unique_item_count": row.get("unique_item_count"),
-            "imageUrl": row.get("image_url"),
-            "latitude": float(row.get("latitude", 0)) if row.get("latitude") else None,
-            "longitude": float(row.get("longitude", 0)) if row.get("longitude") else None,
-            "locationName": row.get("location_name"),
-            "verified": row.get("verified"),
-            "message": row.get("message"),
-            "status": row.get("status"),
-            "timestamp": row.get("created_at"),
-            "user_id": row.get("user_id"),
-            "username": username,
-        }
+        return report_document_to_api(row, username)
     except HTTPException:
         raise
     except Exception as e:

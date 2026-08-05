@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Camera, Upload, Loader2, AlertCircle, CheckCircle, Video, MapPin, Send, Trash, Edit2, X, Plus, Minus, Tag } from 'lucide-react';
-import { detectWaste, getAuthHeaders } from '../services/apiService';
+import { authenticatedFetch, detectWaste } from '../services/apiService';
 import { Language, WasteDataPoint, GeminiAnalysisResult, Severity } from '../types';
 import { TRANSLATIONS } from '../constants';
 
@@ -265,9 +265,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ lang, onReportSubmit, initialDa
 
         try {
             const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-            const saveResponse = await fetch(`${API_URL}/api/reports`, {
+            const saveResponse = await authenticatedFetch(`${API_URL}/api/reports`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(finalRecord)
             });
             if (!saveResponse.ok) {
