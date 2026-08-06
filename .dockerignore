@@ -1,0 +1,12 @@
+.git
+.github
+.agents
+.zcode
+tmp
+backend
+node_modules
+dist
+.env
+.env.*
+!.env.example
+*.log
