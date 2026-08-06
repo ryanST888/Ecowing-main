@@ -216,6 +216,10 @@ def normalize_email(email: str) -> str:
 def get_identity(login_key: str) -> Optional[dict]:
     if cosmos_identities is None:
         return None
+    try:
+        return cosmos_identities.read_item(item=login_key, partition_key=login_key)
+    except cosmos_exceptions.CosmosResourceNotFoundError:
+        return None
 
 
 def add_profile_provider(profile: dict, provider: str) -> dict:
@@ -249,10 +253,6 @@ def verify_google_credential(credential: str) -> dict:
     if not claims.get("sub") or not claims.get("email"):
         raise HTTPException(status_code=401, detail="Google account information is incomplete")
     return claims
-    try:
-        return cosmos_identities.read_item(item=login_key, partition_key=login_key)
-    except cosmos_exceptions.CosmosResourceNotFoundError:
-        return None
 
 
 def refresh_token_hash(token: str) -> str:
